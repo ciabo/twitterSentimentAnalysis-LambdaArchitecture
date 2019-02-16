@@ -40,6 +40,11 @@
             <artifactId>cascalog</artifactId>
             <version>1.10.0</version>
         </dependency>
+        <dependency>
+            <groupId>cascalog</groupId>
+            <artifactId>cascalog-elephantdb</artifactId>
+            <version>1.10.1</version>
+        </dependency>
     </dependencies>
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
