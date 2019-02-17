@@ -12,9 +12,20 @@ public class SentimentBolt extends BaseBasicBolt {
     }
 
     public void execute(Tuple tuple, BasicOutputCollector collector) {
-        String tweet = tuple.getString(0);
+        String line = tuple.getStringByField("line");
+        String[] split = line.split(",");
+        String tweet = split[2];
+        String[] keywords = {"apple","google","microsoft"};
+        boolean keywordPresent=false;
+        int i = 0;
+        while(keywordPresent==false && i<keywords.length){
+            keywordPresent=tweet.contains(keywords[i]);
+        }
+        if(keywordPresent==true){
+            NLP.init(); //probably the init must be put in the class initializer because is sloow
+            int sentiment = NLP.findSentiment(tweet);
 
-        //
-
+            collector.emit( new Values(keywords[i],sentiment));
+        }
     }
 }

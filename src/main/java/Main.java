@@ -9,14 +9,16 @@ import org.apache.storm.tuple.Fields;
 import java.io.*;
 
 public class Main {
+
     public static void main(String[] argv) throws IOException {
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("tweet_spout", new TweetSpout(), 4);
-        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).
-                shuffleGrouping("contribution_spout");
+        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
+        builder.setBolt("count_bolt", new CountBolt(),4).fieldsGrouping("sentiment_bolt",new Fields("keyword"));
         LocalCluster cluster = new LocalCluster();
         Config conf = new Config();
-        cluster.submitTopology("wiki-contributors", conf, builder.createTopology());
+        conf.setDebug(true);
+        cluster.submitTopology("tweetp", conf, builder.createTopology());
         cluster.shutdown();
 //        String path = "./tweet/data"; //tweet folder must be deleted at each execution
 //        Pail tweetPail = Pail.create(path, new TweetStructure());
