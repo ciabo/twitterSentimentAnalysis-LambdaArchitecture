@@ -3,9 +3,15 @@ package masterdataset;
 import com.backtype.hadoop.pail.Pail;
 import com.backtype.hadoop.pail.PailSpec;
 import com.backtype.hadoop.pail.SequenceFileFormat;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 
-import javax.security.auth.login.Configuration;
 import java.io.IOException;
+import java.net.URI;
+import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,12 +42,18 @@ public class DataStore {
         }
     }
 
-    public void appendTweet(String src, String dst) throws IOException {
-        Pail<Tweet> tweetOld = new Pail<Tweet>(dst);
-        Pail<Tweet> tweetNew = new Pail<Tweet>(src);
-        tweetOld.absorb(tweetNew);
-        tweetOld.consolidate();
+    public void appendTweet(Pail src, Pail dst) throws IOException {
+        dst.absorb(src);
+        dst.consolidate();
     }
+//    public void ingestPail(Pail masterPail, Pail newDataPail) throws IOException {
+//        FileSystem fs = new FileSystem.get(new Configuration());
+//        fs.delete(new Path("./tweet/swa"), true); // folder to store the snapshot of new data folder
+//        fs.mkdirs(new Path("./tweet/swa"));
+//
+//        Pail snapshotPail = newDataPail.snapshot("/tweet/swa/newDatasnapshot");
+//
+//    }
 
     public void compressPail() throws IOException {
         Map<String, Object> options = new HashMap<String, Object>();
@@ -51,7 +63,31 @@ public class DataStore {
         Pail compressed = Pail.create("./tweet/compressed", new PailSpec("SequenceFile", options, struct));
     }
 
-//    public void ingestPail(Pail masterPail, Pail newDataPail) throws IOException {
-//        FileSystem fs = new FileSystem.get(new Configuration());
-//    }
+    public void ingestPail(final Pail masterPail, final Pail newDataPail) throws IOException {
+        try {
+            UserGroupInformation ugi = UserGroupInformation.createRemoteUser("hduser");
+
+            ugi.doAs(new PrivilegedExceptionAction<Void>() {
+                public Void run() throws Exception {
+
+                    Configuration conf = new Configuration();
+                    conf.set("fs.defaultFS", "hdfs://localhost:9000/user/hduser");
+                    conf.set("hadoop.job.ugi", "hduser");
+
+                    FileSystem fs = FileSystem.get(conf);
+                    fs.delete(new Path("./tweet/swa"), true); // folder to store the snapshot of new data folder
+                    fs.mkdirs(new Path("./tweet/swa"));
+
+                    Pail snapshotPail = newDataPail.snapshot("/tweet/swa/newDataSnapshot");
+                    appendTweet(newDataPail, masterPail);
+                    newDataPail.deleteSnapshot(snapshotPail);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+//        //configuration setting for hadoop fs. Maybe work maybe not!
+
+    }
 }
