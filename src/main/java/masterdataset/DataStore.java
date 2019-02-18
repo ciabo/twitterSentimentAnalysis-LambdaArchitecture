@@ -4,6 +4,7 @@ import com.backtype.hadoop.pail.Pail;
 import com.backtype.hadoop.pail.PailSpec;
 import com.backtype.hadoop.pail.SequenceFileFormat;
 
+import javax.security.auth.login.Configuration;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,4 +50,8 @@ public class DataStore {
         TweetStructure struct = new TweetStructure();
         Pail compressed = Pail.create("./tweet/compressed", new PailSpec("SequenceFile", options, struct));
     }
+
+//    public void ingestPail(Pail masterPail, Pail newDataPail) throws IOException {
+//        FileSystem fs = new FileSystem.get(new Configuration());
+//    }
 }

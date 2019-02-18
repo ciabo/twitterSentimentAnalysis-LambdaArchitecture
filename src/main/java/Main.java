@@ -4,6 +4,7 @@ import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
+import masterdataset.MDatasetQuery;
 import masterdataset.TweetStructure;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
@@ -11,9 +12,11 @@ import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 public class Main {
-
     public static void main(String[] argv) throws IOException {
 
 //        TopologyBuilder builder = new TopologyBuilder();
@@ -26,11 +29,11 @@ public class Main {
 //        cluster.submitTopology("tweetp", conf, builder.createTopology());
 //        cluster.shutdown();
 
-        String path = "./tweet/data"; //tweet folder must be deleted at each execution
-        Pail tweetPail = Pail.create(path, new TweetStructure());
-        DataStore ds = new DataStore();
-        ds.writeTweet(tweetPail, path, "Team Giannis", 1502019, 192133);
-        ds.readTweet(tweetPail, path);
+//        String path = "./tweet/data"; //tweet folder must be deleted at each execution
+//        Pail tweetPail = Pail.create(path, new TweetStructure());
+//        DataStore ds = new DataStore();
+//        ds.writeTweet(tweetPail, path, "Team Giannis", 1502019, 192133);
+//        ds.readTweet(tweetPail, path);
 
 //
 //        File file = new File("./db.txt");
@@ -42,5 +45,15 @@ public class Main {
 //            ds.writeTweet(tweetPail, path, wrd[2], Integer.parseInt(wrd[0]), Integer.parseInt(wrd[1]));
 //        }
 //        br.close();
+
+        MDatasetQuery mq = new MDatasetQuery();
+        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
+                Arrays.asList("Shame!"),
+                Arrays.asList("Tomorrow will be a good day"),
+                Arrays.asList("Tomorrow apple will die"),
+                Arrays.asList("Today google shows a new product"),
+                Arrays.asList("CEO of microsoft is Bill Gates"),
+                Arrays.asList("Jcascalog it's wonderful!"));
+        MDatasetQuery.tweetProcessing(tweet);
     }
 }

@@ -27,12 +27,19 @@ public class MDatasetQuery {
                 new StdoutTap(),
                 new Subquery("?person", "?age")
                         .predicate(ages, "?person", "?age")
-                        .predicate(new LT(), "?age", 30));
+                        .predicate(new LT(), "?age", 30)
+        );
+    }
+
+    public static void tweetProcessing(List tweet) {
+        Api.execute(
+                new StdoutTap(),
+                new Subquery("?tweet", "?sentiment")
+                        .predicate(tweet, "?tweet")
+                        .predicate(new SentimentAnalysis(), "?tweet").out("?tweet", "?sentiment")
+        );
     }
 
 
-    public void tweetKeywordCount(List<String> tweet, String keyword){
-
-    }
 }
 

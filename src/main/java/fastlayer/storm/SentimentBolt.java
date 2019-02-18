@@ -6,7 +6,7 @@ import org.apache.storm.topology.base.BaseBasicBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
-import utils.*;
+import utils.NLP;
 
 public class SentimentBolt extends BaseBasicBolt {
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
