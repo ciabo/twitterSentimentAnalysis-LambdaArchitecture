@@ -1,4 +1,4 @@
-package mdataset;
+package masterdataset;
 
 import com.backtype.hadoop.pail.PailStructure;
 

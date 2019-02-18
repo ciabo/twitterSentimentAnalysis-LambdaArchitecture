@@ -1,3 +1,5 @@
+package fastlayer.storm;
+
 import com.backtype.support.Utils;
 import org.apache.storm.spout.SpoutOutputCollector;
 import org.apache.storm.task.TopologyContext;
@@ -17,26 +19,21 @@ public class TweetSpout extends BaseRichSpout {
     private List<String> records;
     private int dbcounter;
 
-
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         this.collector = collector;
 
-        this.dbcounter=0;
+        this.dbcounter = 0;
         String filename = "db.txt";
         this.records = new ArrayList<String>();
-        try
-        {
+        try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
             String line;
-            while ((line = reader.readLine()) != null)
-            {
+            while ((line = reader.readLine()) != null) {
                 records.add(line);
             }
             reader.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.format("Exception occurred trying to read '%s'.", filename);
             e.printStackTrace();
         }
@@ -49,10 +46,8 @@ public class TweetSpout extends BaseRichSpout {
 
     public void nextTuple() {
         Utils.sleep(100);
-        String line=records.get(dbcounter);
+        String line = records.get(dbcounter);
         dbcounter++;
         collector.emit(new Values(line));
-
     }
-
 }

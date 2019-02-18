@@ -1,4 +1,4 @@
-package mdataset;
+package masterdataset;
 
 public class Tweet {
     private String tweet;

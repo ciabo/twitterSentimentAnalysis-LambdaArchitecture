@@ -1,19 +1,18 @@
+package fastlayer.cassandra;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
 public class SentimentRepository {
-
     private static final String TABLE_NAME = "sentimentCount";
-
     private Session session;
 
     public SentimentRepository(Session session) {
         this.session = session;
     }
 
-    public void createTable(){
+    public void createTable() {
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ")
                 .append(TABLE_NAME).append("(")
                 .append("keyword text, ")
@@ -24,7 +23,7 @@ public class SentimentRepository {
         session.execute(query);
     }
 
-    public int selectCountFromKey(String keyword, int sentiment){
+    public int selectCountFromKey(String keyword, int sentiment) {
         StringBuilder sb = new StringBuilder("SELECT count FROM ")
                 .append(TABLE_NAME)
                 .append(" WHERE keyword = '")
@@ -38,7 +37,7 @@ public class SentimentRepository {
         return r.getInt("count");
     }
 
-    public void updateCount(String keyword, int sentiment, int newCount){
+    public void updateCount(String keyword, int sentiment, int newCount) {
         StringBuilder sb = new StringBuilder("UPDATE ")
                 .append(TABLE_NAME)
                 .append(" SET count = '")
@@ -51,12 +50,11 @@ public class SentimentRepository {
         final String query = sb.toString();
         session.execute(query);
     }
+
     public void deleteTable() {
         StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ").append(TABLE_NAME);
 
         final String query = sb.toString();
         session.execute(query);
     }
-
-
 }

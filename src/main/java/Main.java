@@ -1,7 +1,10 @@
 import com.backtype.hadoop.pail.Pail;
 import com.datastax.driver.core.Session;
-import mdataset.DataStore;
-import mdataset.TweetStructure;
+import fastlayer.storm.CountBolt;
+import fastlayer.storm.SentimentBolt;
+import fastlayer.storm.TweetSpout;
+import masterdataset.DataStore;
+import masterdataset.TweetStructure;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
@@ -13,20 +16,21 @@ public class Main {
 
     public static void main(String[] argv) throws IOException {
 
-        TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("tweet_spout", new TweetSpout(), 4);
-        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
-        builder.setBolt("count_bolt", new CountBolt(),4).fieldsGrouping("sentiment_bolt",new Fields("keyword"));
-        LocalCluster cluster = new LocalCluster();
-        Config conf = new Config();
-        conf.setDebug(true);
-        cluster.submitTopology("tweetp", conf, builder.createTopology());
-        cluster.shutdown();
-//        String path = "./tweet/data"; //tweet folder must be deleted at each execution
-//        Pail tweetPail = Pail.create(path, new TweetStructure());
-//        DataStore ds = new DataStore();
-//        ds.writeTweet(tweetPail, path, "Team Giannis", 1502019, 192133);
-//        ds.readTweet(tweetPail, path);
+//        TopologyBuilder builder = new TopologyBuilder();
+//        builder.setSpout("tweet_spout", new TweetSpout(), 4);
+//        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
+//        builder.setBolt("count_bolt", new CountBolt(),4).fieldsGrouping("sentiment_bolt",new Fields("keyword"));
+//        LocalCluster cluster = new LocalCluster();
+//        Config conf = new Config();
+//        conf.setDebug(true);
+//        cluster.submitTopology("tweetp", conf, builder.createTopology());
+//        cluster.shutdown();
+
+        String path = "./tweet/data"; //tweet folder must be deleted at each execution
+        Pail tweetPail = Pail.create(path, new TweetStructure());
+        DataStore ds = new DataStore();
+        ds.writeTweet(tweetPail, path, "Team Giannis", 1502019, 192133);
+        ds.readTweet(tweetPail, path);
 
 //
 //        File file = new File("./db.txt");

@@ -1,3 +1,5 @@
+package utils;
+
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -29,7 +31,6 @@ public class NLP {
                     mainSentiment = sentiment;
                     longest = partText.length();
                 }
-
             }
         }
         switch (mainSentiment) {
