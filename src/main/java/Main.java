@@ -1,4 +1,5 @@
 import com.backtype.hadoop.pail.Pail;
+import com.datastax.driver.core.Session;
 import mdataset.DataStore;
 import mdataset.TweetStructure;
 import org.apache.storm.Config;
@@ -11,6 +12,7 @@ import java.io.*;
 public class Main {
 
     public static void main(String[] argv) throws IOException {
+
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("tweet_spout", new TweetSpout(), 4);
         builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
