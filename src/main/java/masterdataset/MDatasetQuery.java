@@ -1,24 +1,23 @@
 package masterdataset;
 
-import cascalog.CascalogFunction;
 import com.twitter.maple.tap.StdoutTap;
 import jcascalog.Api;
 import jcascalog.Playground;
 import jcascalog.Subquery;
-import jcascalog.op.LT;
+import jcascalog.op.Count;
+import jcascalog.op.GT;
+import org.apache.hadoop.util.DataChecksum;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class MDatasetQuery {
     public static void tweetProcessing(List tweet) {
         Api.execute(
                 new StdoutTap(),
-                new Subquery("?tweet", "?sentiment")
+                new Subquery("?keyword", "?sentiment", "?count")
                         .predicate(tweet, "?tweet")
-                        .predicate(new SentimentAnalysis(), "?tweet").out("?tweet", "?sentiment")
+                        .predicate(new SentimentAnalysis(), "?tweet").out("?keyword", "?sentiment")
+                        .predicate(new Count(), "?count")
         );
     }
 }

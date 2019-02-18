@@ -53,6 +53,7 @@ public class Main {
                 Arrays.asList("Tomorrow apple will die"),
                 Arrays.asList("Today google shows a new product"),
                 Arrays.asList("CEO of microsoft is Bill Gates"),
+                Arrays.asList("New microsoft update is available"),
                 Arrays.asList("Jcascalog it's wonderful!"));
         MDatasetQuery.tweetProcessing(tweet);
     }
