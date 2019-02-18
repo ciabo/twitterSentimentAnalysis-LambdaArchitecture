@@ -1,4 +1,4 @@
-package masterdataset;
+package mdataset;
 
 import cascalog.CascalogFunction;
 import com.twitter.maple.tap.StdoutTap;
@@ -22,13 +22,17 @@ public class MDatasetQuery {
                 Arrays.asList("luca", 18));
     }
 
-    public static void tweetProcessing(List tweet) {
+    public static void twentyFiveYearOlds() {
         Api.execute(
                 new StdoutTap(),
-                new Subquery("?tweet", "?sentiment")
-                        .predicate(tweet, "?tweet")
-                        .predicate(new SentimentAnalysis(), "?tweet").out("?tweet", "?sentiment")
-        );
+                new Subquery("?person", "?age")
+                        .predicate(ages, "?person", "?age")
+                        .predicate(new LT(), "?age", 30));
+    }
+
+
+    public void tweetKeywordCount(List<String> tweet, String keyword){
+
     }
 }
 
