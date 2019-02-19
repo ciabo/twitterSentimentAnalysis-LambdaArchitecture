@@ -14,7 +14,6 @@ public class CassandraConnector {
             b.withPort(port);
         }
         cluster = b.build();
-
         session = cluster.connect();
     }
 
