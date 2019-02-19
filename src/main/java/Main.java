@@ -56,32 +56,32 @@ public class Main {
 //        sleep(1000000);
 //        cluster.shutdown();
 
-        //tweet folder must be deleted at each execution
-        DataStore ds = new DataStore();
-        // Hadoop fs configuration
-        Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
-        FileSystem fs = FileSystem.get(conf);
-        if (fs.exists(new Path("hdfs://localhost:9000/user/ettore/tweet/data")) &&
-                fs.exists(new Path("hdfs://localhost:9000/user/ettore/tweet/newData"))) {
-
-            fs.delete(new Path("hdfs://localhost:9000/user/ettore/tweet"), true);
-        }
-
-
-        String path = "hdfs://localhost:9000/user/ettore/tweet/data";
-        Pail tweetPail = Pail.create(path, new TweetStructure());
-        writeTweet(tweetPail, "Team Giannis", 1502019, 192133);
-        readTweet(path);
-
-        String newpath = "hdfs://localhost:9000/user/ettore/tweet/newData";
-        Pail newPail = Pail.create(newpath, new TweetStructure());
-        writeTweet(newPail, "This isn't good", 13022019, 155849);
-        readTweet(newpath);
-
-        System.out.println("Data folder: ");
-        ingestPail(tweetPail, newPail);
-        readTweet(path);
+//        //tweet folder must be deleted at each execution
+//        DataStore ds = new DataStore();
+//        // Hadoop fs configuration
+//        Configuration conf = new Configuration();
+//        conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
+//        FileSystem fs = FileSystem.get(conf);
+//        if (fs.exists(new Path("hdfs://localhost:9000/user/ettore/tweet/data")) &&
+//                fs.exists(new Path("hdfs://localhost:9000/user/ettore/tweet/newData"))) {
+//
+//            fs.delete(new Path("hdfs://localhost:9000/user/ettore/tweet"), true);
+//        }
+//
+//
+//        String path = "hdfs://localhost:9000/user/ettore/tweet/data";
+//        Pail tweetPail = Pail.create(path, new TweetStructure());
+//        writeTweet(tweetPail, "Team Giannis", 1502019, 192133);
+//        readTweet(path);
+//
+//        String newpath = "hdfs://localhost:9000/user/ettore/tweet/newData";
+//        Pail newPail = Pail.create(newpath, new TweetStructure());
+//        writeTweet(newPail, "This isn't good", 13022019, 155849);
+//        readTweet(newpath);
+//
+//        System.out.println("Data folder: ");
+//        ingestPail(tweetPail, newPail);
+//        readTweet(path);
 
 //        DataStore ds = new DataStore();
 //        ds.compressPail(); // native-hadoop code error. The files are generated properly. Maybe a local error. Maybe unuseful.
@@ -97,16 +97,17 @@ public class Main {
 //        }
 //        br.close();
 
-//        MDatasetQuery mq = new MDatasetQuery();
-//        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
-//                Arrays.asList("Shame!"),
-//                Arrays.asList("Tomorrow will be a good day"),
-//                Arrays.asList("Tomorrow apple will die"),
-//                Arrays.asList("Today google shows a new product"),
-//                Arrays.asList("CEO of microsoft is Bill Gates"),
-//                Arrays.asList("New microsoft update is available"),
-//                Arrays.asList("Jcascalog it's wonderful!"));
-//        MDatasetQuery.tweetProcessing(tweet);
+        MDatasetQuery mq = new MDatasetQuery();
+        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
+                Arrays.asList("Shame!"),
+                Arrays.asList("Tomorrow will be a good day"),
+                Arrays.asList("Tomorrow apple will die"),
+                Arrays.asList("Today google shows a new product"),
+                Arrays.asList("CEO of microsoft is Bill Gates"),
+                Arrays.asList("New microsoft update is available"),
+                Arrays.asList("Jcascalog it's wonderful!"),
+                Arrays.asList("apple it's wonderful!"));
+        MDatasetQuery.tweetProcessing(tweet);
     }
 }
 
