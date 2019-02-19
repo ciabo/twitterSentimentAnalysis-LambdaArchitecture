@@ -47,7 +47,9 @@ public class TweetSpout extends BaseRichSpout {
     public void nextTuple() {
         Utils.sleep(100);
         String line = records.get(dbcounter);
-        dbcounter++;
-        collector.emit(new Values(line));
+        if(dbcounter < records.size()-1) {
+            dbcounter++;
+            collector.emit(new Values(line));
+        }
     }
 }

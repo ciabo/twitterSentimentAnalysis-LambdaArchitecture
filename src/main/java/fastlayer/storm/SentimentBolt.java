@@ -22,6 +22,7 @@ public class SentimentBolt extends BaseBasicBolt {
         int i = 0;
         while (keywordPresent == false && i < keywords.length) {
             keywordPresent = tweet.toLowerCase().contains(keywords[i]);
+            i++;
         }
         if (keywordPresent == true) {
             NLP.init(); //probably the init must be put in the class initializer because is slow
