@@ -1,8 +1,5 @@
 import com.backtype.hadoop.pail.Pail;
 import com.datastax.driver.core.Session;
-import fastlayer.cassandra.CassandraConnector;
-import fastlayer.cassandra.KeyspaceRepository;
-import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
@@ -90,3 +87,4 @@ public class Main {
 //        MDatasetQuery.tweetProcessing(tweet);
     }
 }
+
