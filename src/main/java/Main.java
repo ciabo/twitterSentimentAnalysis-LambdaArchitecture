@@ -5,6 +5,7 @@ import backtype.storm.tuple.Fields;
 import com.backtype.hadoop.pail.Pail;
 import com.datastax.driver.core.Session;
 import fastlayer.cassandra.CassandraConnector;
+import fastlayer.cassandra.KeyspaceRepository;
 import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
@@ -101,10 +102,15 @@ public class Main {
 //        br.close();
 
         MDatasetQuery mq = new MDatasetQuery();
+
         CassandraConnector client = new CassandraConnector();
         client.connect("127.0.0.1", null);
-        MDatasetQuery.smr = new SentimentRepository(client.getSession());
-//        MDatasetQuery.smr = Arrays.asList("Ehi merda");
+        mq.setSentimentRepo(new SentimentRepository(client.getSession()));
+
+        KeyspaceRepository keyspace = new KeyspaceRepository(client.getSession());
+        keyspace.createKeyspace("sentimentAnalysis", "SimpleStrategy", 1);
+        keyspace.useKeyspace("sentimentAnalysis");
+
         List tweet = Arrays.asList(Arrays.asList("Go gsw"),
                 Arrays.asList("Shame!"),
                 Arrays.asList("Tomorrow will be a good day"),
@@ -114,6 +120,6 @@ public class Main {
                 Arrays.asList("New microsoft update is available"),
                 Arrays.asList("Jcascalog it's wonderful!"),
                 Arrays.asList("apple it's wonderful!"));
-        MDatasetQuery.tweetProcessing(tweet);
+        mq.tweetProcessing(tweet, "batchtable");
     }
 }
