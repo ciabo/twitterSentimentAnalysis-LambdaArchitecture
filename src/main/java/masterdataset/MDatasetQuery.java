@@ -9,7 +9,7 @@ import jcascalog.op.Count;
 import java.util.List;
 
 public class MDatasetQuery {
-    public static void tweetProcessing(List tweet, SentimentRepository smr) {
+    public static void tweetProcessing(List tweet, List smr) {
         Api.execute(
                 new StdoutTap(),
                 new Subquery("?keyword", "?sentiment", "?count")
