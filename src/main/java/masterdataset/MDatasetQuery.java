@@ -15,6 +15,9 @@ public class MDatasetQuery {
         MDatasetQuery.smr = smr;
     }
 
+    public void createTable(String tablename) {
+        smr.createTable(tablename);
+    }
 
     public void tweetProcessing(List tweet, String tablename) {
         smr.createTable(tablename);
