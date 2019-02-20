@@ -5,16 +5,15 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 
 public class SentimentRepository {
-    private static final String TABLE_NAME = "sentimentCount";
     private Session session;
 
     public SentimentRepository(Session session) {
         this.session = session;
     }
 
-    public void createTable() {
+    public void createTable(String tablename) {
         StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ")
-                .append(TABLE_NAME).append("(")
+                .append(tablename).append("(")
                 .append("keyword text, ")
                 .append("sentiment int,")
                 .append("count int,")
@@ -23,9 +22,9 @@ public class SentimentRepository {
         session.execute(query);
     }
 
-    public int selectCountFromKey(String keyword, int sentiment) {
+    public int selectCountFromKey(String tablename,String keyword, int sentiment) {
         StringBuilder sb = new StringBuilder("SELECT count FROM ")
-                .append(TABLE_NAME)
+                .append(tablename)
                 .append(" WHERE keyword = '")
                 .append(keyword)
                 .append("' AND sentiment = ")
@@ -37,9 +36,9 @@ public class SentimentRepository {
         return r.getInt("count");
     }
 
-    public void updateCount(String keyword, int sentiment, int newCount) {
+    public void updateCount(String tablename, String keyword, int sentiment, int newCount) {
         StringBuilder sb = new StringBuilder("UPDATE ")
-                .append(TABLE_NAME)
+                .append(tablename)
                 .append(" SET count = ")
                 .append(newCount)
                 .append(" WHERE keyword = '")
@@ -51,8 +50,8 @@ public class SentimentRepository {
         session.execute(query);
     }
 
-    public void deleteTable() {
-        StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ").append(TABLE_NAME);
+    public void deleteTable(String tablename) {
+        StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ").append(tablename);
 
         final String query = sb.toString();
         session.execute(query);
