@@ -1,3 +1,7 @@
+import backtype.storm.Config;
+import backtype.storm.LocalCluster;
+import backtype.storm.topology.TopologyBuilder;
+import backtype.storm.tuple.Fields;
 import com.backtype.hadoop.pail.Pail;
 import com.datastax.driver.core.Session;
 import fastlayer.storm.CountBolt;
@@ -12,10 +16,7 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
-import org.apache.storm.Config;
-import org.apache.storm.LocalCluster;
-import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.tuple.Fields;
+
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -45,16 +46,16 @@ public class Main {
 //        int count = db.selectCountFromKey("apple", -1);
 //        int a =1;
 
-//        TopologyBuilder builder = new TopologyBuilder();
-//        builder.setSpout("tweet_spout", new TweetSpout(), 1);
-//        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
-//        builder.setBolt("count_bolt", new CountBolt(),4).fieldsGrouping("sentiment_bolt",new Fields("keyword","sentiment"));
-//        LocalCluster cluster = new LocalCluster();
-//        Config conf = new Config();
-//        conf.setDebug(true);
-//        cluster.submitTopology("tweetp", conf, builder.createTopology());
-//        sleep(1000000);
-//        cluster.shutdown();
+        TopologyBuilder builder = new TopologyBuilder();
+        builder.setSpout("tweet_spout", new TweetSpout(), 1);
+        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
+        builder.setBolt("count_bolt", new CountBolt(), 4).fieldsGrouping("sentiment_bolt", new Fields("keyword", "sentiment"));
+        LocalCluster cluster = new LocalCluster();
+        Config conf = new Config();
+        conf.setDebug(true);
+        cluster.submitTopology("tweetp", conf, builder.createTopology());
+        sleep(1000000);
+        cluster.shutdown();
 
 //        //tweet folder must be deleted at each execution
 //        DataStore ds = new DataStore();
@@ -97,17 +98,17 @@ public class Main {
 //        }
 //        br.close();
 
-        MDatasetQuery mq = new MDatasetQuery();
-        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
-                Arrays.asList("Shame!"),
-                Arrays.asList("Tomorrow will be a good day"),
-                Arrays.asList("Tomorrow apple will die"),
-                Arrays.asList("Today google shows a new product"),
-                Arrays.asList("CEO of microsoft is Bill Gates"),
-                Arrays.asList("New microsoft update is available"),
-                Arrays.asList("Jcascalog it's wonderful!"),
-                Arrays.asList("apple it's wonderful!"));
-        MDatasetQuery.tweetProcessing(tweet);
+//        MDatasetQuery mq = new MDatasetQuery();
+//        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
+//                Arrays.asList("Shame!"),
+//                Arrays.asList("Tomorrow will be a good day"),
+//                Arrays.asList("Tomorrow apple will die"),
+//                Arrays.asList("Today google shows a new product"),
+//                Arrays.asList("CEO of microsoft is Bill Gates"),
+//                Arrays.asList("New microsoft update is available"),
+//                Arrays.asList("Jcascalog it's wonderful!"),
+//                Arrays.asList("apple it's wonderful!"));
+//        MDatasetQuery.tweetProcessing(tweet);
+//    }
     }
 }
-
