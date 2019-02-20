@@ -45,17 +45,17 @@ public class Main {
 //        db.updateCount("microsoft", -1, 4);
 //        int count = db.selectCountFromKey("apple", -1);
 //        int a =1;
-
-        TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("tweet_spout", new TweetSpout(), 1);
-        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
-        builder.setBolt("count_bolt", new CountBolt(), 4).fieldsGrouping("sentiment_bolt", new Fields("keyword", "sentiment"));
-        LocalCluster cluster = new LocalCluster();
-        Config conf = new Config();
-        conf.setDebug(true);
-        cluster.submitTopology("tweetp", conf, builder.createTopology());
-        sleep(1000000);
-        cluster.shutdown();
+//
+//        TopologyBuilder builder = new TopologyBuilder();
+//        builder.setSpout("tweet_spout", new TweetSpout(), 1);
+//        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
+//        builder.setBolt("count_bolt", new CountBolt(), 4).fieldsGrouping("sentiment_bolt", new Fields("keyword", "sentiment"));
+//        LocalCluster cluster = new LocalCluster();
+//        Config conf = new Config();
+//        conf.setDebug(true);
+//        cluster.submitTopology("tweetp", conf, builder.createTopology());
+//        sleep(1000000);
+//        cluster.shutdown();
 
 //        //tweet folder must be deleted at each execution
 //        DataStore ds = new DataStore();
