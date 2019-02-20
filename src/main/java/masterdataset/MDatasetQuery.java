@@ -1,25 +1,23 @@
 package masterdataset;
 
 import com.twitter.maple.tap.StdoutTap;
+import fastlayer.cassandra.SentimentRepository;
 import jcascalog.Api;
-import jcascalog.Playground;
 import jcascalog.Subquery;
-import jcascalog.example.Split;
 import jcascalog.op.Count;
-import jcascalog.op.GT;
-import org.apache.hadoop.util.DataChecksum;
 
 import java.util.List;
 
 public class MDatasetQuery {
-
-    public static void tweetProcessing(List tweet) {
+    public static void tweetProcessing(List tweet, SentimentRepository smr) {
         Api.execute(
                 new StdoutTap(),
                 new Subquery("?keyword", "?sentiment", "?count")
                         .predicate(tweet, "?tweet")
                         .predicate(new SentimentAnalysis(), "?tweet").out("?keyword", "?sentiment")
                         .predicate(new Count(), "?count")
+                        .predicate(smr, "?smr")
+                        .predicate(new QueryResult(), "?keyword", "?sentiment", "?count", "?smr").out("?keyword", "?sentiment", "?count")
         );
     }
 }
