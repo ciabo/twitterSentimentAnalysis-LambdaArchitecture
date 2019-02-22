@@ -32,6 +32,8 @@ public class LAexec {
 //                    bwF.append(tweet+"\n");
                 }
                 count++;
+//                bwB.close();
+//                bwF.close();
             }
         } catch (IOException e) {
             System.out.println("Error with file %s" + filename);
