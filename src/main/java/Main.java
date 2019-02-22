@@ -20,6 +20,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.mortbay.jetty.Connector;
+import utils.Utils;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -101,25 +102,32 @@ public class Main {
 //        }
 //        br.close();
 
-        MDatasetQuery mq = new MDatasetQuery();
+//        MDatasetQuery mq = new MDatasetQuery();
+//
+//        CassandraConnector client = new CassandraConnector();
+//        client.connect("127.0.0.1", null);
+//        mq.setSentimentRepo(new SentimentRepository(client.getSession()));
+//
+//        KeyspaceRepository keyspace = new KeyspaceRepository(client.getSession());
+//        keyspace.createKeyspace("sentimentAnalysis", "SimpleStrategy", 1);
+//        keyspace.useKeyspace("sentimentAnalysis");
+//
+//        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
+//                Arrays.asList("Shame!"),
+//                Arrays.asList("Tomorrow will be a good day"),
+//                Arrays.asList("Tomorrow apple will die"),
+//                Arrays.asList("Today google shows a new product"),
+//                Arrays.asList("CEO of microsoft is Bill Gates"),
+//                Arrays.asList("New microsoft update is available"),
+//                Arrays.asList("Jcascalog it's wonderful!"),
+//                Arrays.asList("apple it's wonderful!"));
+//        mq.tweetProcessing(tweet, "batchtable");
+//        client.close();
 
-        CassandraConnector client = new CassandraConnector();
-        client.connect("127.0.0.1", null);
-        mq.setSentimentRepo(new SentimentRepository(client.getSession()));
-
-        KeyspaceRepository keyspace = new KeyspaceRepository(client.getSession());
-        keyspace.createKeyspace("sentimentAnalysis", "SimpleStrategy", 1);
-        keyspace.useKeyspace("sentimentAnalysis");
-
-        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
-                Arrays.asList("Shame!"),
-                Arrays.asList("Tomorrow will be a good day"),
-                Arrays.asList("Tomorrow apple will die"),
-                Arrays.asList("Today google shows a new product"),
-                Arrays.asList("CEO of microsoft is Bill Gates"),
-                Arrays.asList("New microsoft update is available"),
-                Arrays.asList("Jcascalog it's wonderful!"),
-                Arrays.asList("apple it's wonderful!"));
-        mq.tweetProcessing(tweet, "batchtable");
+        LAexec la = new LAexec("db.txt");
+//        la.startLA((int) (Utils.countFileLines("db.txt") * 0.7));
+        la.startLA(10);
+        List batch = la.getBatch();
+        List fast = la.getFast();
     }
 }

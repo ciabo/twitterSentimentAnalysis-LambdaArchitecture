@@ -8,7 +8,6 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import com.backtype.support.Utils;
 
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class TweetSpout extends BaseRichSpout {
     public void nextTuple() {
         Utils.sleep(100);
         String line = records.get(dbcounter);
-        if(dbcounter < records.size()-1) {
+        if (dbcounter < records.size() - 1) {
             dbcounter++;
             collector.emit(new Values(line));
         }
