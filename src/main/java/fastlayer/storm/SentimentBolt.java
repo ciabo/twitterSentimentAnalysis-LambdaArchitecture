@@ -1,6 +1,5 @@
 package fastlayer.storm;
 
-
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
@@ -9,11 +8,12 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import utils.NLP;
+import utils.Utils;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class SentimentBolt extends BaseBasicBolt {
-
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("keyword", "sentiment"));
     }
@@ -25,7 +25,7 @@ public class SentimentBolt extends BaseBasicBolt {
     public void execute(Tuple tuple, BasicOutputCollector collector) {
         String line = tuple.getStringByField("line");
         String[] split = line.split(",");
-        String tweet = split[2];
+        String tweet = Utils.createTweet(Arrays.copyOfRange(split, 2, split.length));
         String[] keywords = {"apple", "google", "microsoft"};
         boolean keywordPresent = false;
         int i = 0;
@@ -36,7 +36,6 @@ public class SentimentBolt extends BaseBasicBolt {
         if (keywordPresent == true) {
             //NLP.init(); //probably the init must be put in the class initializer because is slow
             int sentiment = NLP.findSentiment(tweet);
-
             collector.emit(new Values(keywords[i], sentiment));
         }
     }

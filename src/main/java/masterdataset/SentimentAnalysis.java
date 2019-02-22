@@ -21,7 +21,7 @@ public class SentimentAnalysis extends CascalogFunction {
         NLP.init();
         int sentiment = NLP.findSentiment(tweet);
         for (String t : keywords)
-            if (tweet.contains(t))
+            if (tweet.toLowerCase().contains(t))
                 call.getOutputCollector().add(new Tuple(t, sentiment));
     }
 }

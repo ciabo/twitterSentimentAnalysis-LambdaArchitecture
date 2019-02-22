@@ -52,7 +52,6 @@ public class SentimentRepository {
 
     public void deleteTable(String tablename) {
         StringBuilder sb = new StringBuilder("DROP TABLE IF EXISTS ").append(tablename);
-
         final String query = sb.toString();
         session.execute(query);
     }

@@ -5,7 +5,6 @@ import com.datastax.driver.core.Session;
 
 public class CassandraConnector {
     private Cluster cluster;
-
     private Session session;
 
     public void connect(String node, Integer port) {
@@ -25,5 +24,4 @@ public class CassandraConnector {
         session.close();
         cluster.close();
     }
-
 }

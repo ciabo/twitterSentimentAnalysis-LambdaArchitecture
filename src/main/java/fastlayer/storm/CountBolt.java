@@ -34,15 +34,15 @@ public class CountBolt extends BaseBasicBolt {
         schemaRepository.useKeyspace(keyspaceName);
         //create the table
         db = new SentimentRepository(session);
-        tablename="fasttable";
+        tablename = "fasttable";
         db.createTable(tablename);
     }
 
     public void execute(Tuple tuple, BasicOutputCollector collector) {
         String keyword = tuple.getStringByField("keyword");
         int sentiment = tuple.getIntegerByField("sentiment");
-        int count = db.selectCountFromKey(tablename,keyword, sentiment);
+        int count = db.selectCountFromKey(tablename, keyword, sentiment);
         count++;
-        db.updateCount(tablename,keyword, sentiment, count);
+        db.updateCount(tablename, keyword, sentiment, count);
     }
 }

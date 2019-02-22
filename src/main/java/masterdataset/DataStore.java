@@ -1,75 +1,85 @@
 package masterdataset;
 
-import com.backtype.hadoop.pail.Pail;
-import com.backtype.hadoop.pail.PailSpec;
 import com.backtype.hadoop.pail.SequenceFileFormat;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class DataStore {
-    private static final Configuration CONF = new Configuration();
-
-    public static void writeTweet(final Pail<Tweet> tweetPail, final String tweet, final int date, final int timestamp) throws IOException {
-        Pail.TypedRecordOutputStream out = tweetPail.openWrite();
-        out.writeObject(new Tweet(tweet, date, timestamp));
-        out.close();
+    public static FileSystem configureHDFS() {
+        FileSystem fs = null;
+        try {
+            Configuration conf = new Configuration();
+            conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false"); // TODO: 22/02/19 MAYBE in a cluster with multiple nodes must be true
+            conf.setBoolean("dfs.support.append", true);
+            fs = FileSystem.get(conf);
+        } catch (IOException e) {
+            System.out.println("Unable to configure fle system!");
+        }
+        return fs;
     }
 
-    public void writeCompressedTweet(String path, String tweet, int date, int timestamp) throws IOException {
-        Pail pail = new Pail<Tweet>(path);
-        Pail.TypedRecordOutputStream out = pail.openWrite();
-        out.writeObject(new Tweet(tweet, date, timestamp));
-        out.close();
+    public static FileSystem createAppendHDFS(FileSystem fs, String filePath, String tweet) throws IOException {
+        Path hdfsPath = new Path(filePath);
+        FSDataOutputStream out;
+        Boolean isAppendable = Boolean.valueOf(fs.getConf().get("dfs.support.append"));
+        PrintWriter writer;
+        if (isAppendable) {
+            if (fs.exists(hdfsPath)) {
+                out = fs.append(hdfsPath);
+                writer = new PrintWriter(out);
+                writer.append(tweet + "\n");
+            } else {
+                out = fs.create(hdfsPath);
+                writer = new PrintWriter(out);
+                writer.append(tweet + "\n");
+            }
+            writer.flush();
+            out.hflush();
+            writer.close();
+            out.close();
+        } else
+            System.out.println("----------File " + filePath + " isn't appendable----------");
+        return fs;
     }
 
-    public static void readTweet(String path) throws IOException {
-        Pail<Tweet> tweetPail = new Pail<Tweet>(path);
-        for (Tweet t : tweetPail) {
-            System.out.println("Tweet: " + t.getTweet() + " Date: " + t.getDate() + " Time: " + t.getTimestamp());
+    public static String readFromHdfs(FileSystem fileSystem, String filePath) {
+        Path hdfsPath = new Path(filePath);
+        StringBuilder fileContent = new StringBuilder();
+        try {
+            BufferedReader bfr = new BufferedReader(new InputStreamReader(fileSystem.open(hdfsPath)));
+            String str;
+            while ((str = bfr.readLine()) != null) {
+                fileContent.append(str + "\n");
+            }
+        } catch (IOException ex) {
+            System.out.println("----------Could not read from HDFS---------");
+        }
+        return fileContent.toString();
+    }
+
+    public static void deleteFromHdfs(FileSystem fs, String filePath) {
+        try {
+            if (fs.exists(new Path(filePath)))
+                fs.delete(new Path(filePath));
+        } catch (IOException e) {
+            System.out.println("----------Unable to delete " + filePath + "----------");
         }
     }
 
-    public void readCompressedTweet(String path) throws IOException {
-        Pail<Tweet> tweetPail = new Pail<Tweet>(path);
-        for (Tweet t : tweetPail) {
-            System.out.println("Tweet: " + t.getTweet() + " Date: " + t.getDate() + " Time: " + t.getTimestamp());
+    public static void closeHDFS(FileSystem fs) {
+        try {
+            fs.close();
+        } catch (IOException e) {
+            System.out.println("----------Unable to close  file system----------");
         }
-    }
-
-    private static void appendTweet(Pail src, Pail dst) throws IOException {
-        dst.absorb(src);
-        dst.consolidate();
-    }
-
-    public void compressPail() throws IOException {
-        Map<String, Object> options = new HashMap<String, Object>();
-        options.put(SequenceFileFormat.CODEC_ARG, SequenceFileFormat.CODEC_ARG_GZIP);
-        options.put(SequenceFileFormat.TYPE_ARG, SequenceFileFormat.TYPE_ARG_BLOCK);
-        TweetStructure struct = new TweetStructure();
-        Pail compressed = Pail.create("./tweet/compressed", new PailSpec("SequenceFile", options, struct));
-    }
-
-    public static void ingestPail(Pail masterPail, Pail newDataPail) throws IOException {
-
-        Configuration conf = new Configuration();
-        conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
-        FileSystem fs = FileSystem.get(conf);
-        fs.delete(new Path("/tweet/swa"), true); // folder to store the snapshot of new data folder
-        fs.mkdirs(new Path("/tweet/swa"));
-
-        Pail snapshotPail = newDataPail.snapshot("hdfs://localhost:9000/user/ettore/tweet/swa/newDataSnapshot");
-        appendTweet(snapshotPail, masterPail);
-        readTweet("hdfs://localhost:9000/user/ettore/tweet/swa/newDataSnapshot");
-        newDataPail.deleteSnapshot(snapshotPail);
     }
 }
