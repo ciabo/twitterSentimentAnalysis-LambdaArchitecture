@@ -2,34 +2,14 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
-import com.backtype.hadoop.pail.Pail;
-import com.datastax.driver.core.Session;
-import fastlayer.cassandra.CassandraConnector;
-import fastlayer.cassandra.KeyspaceRepository;
-import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
-import masterdataset.MDatasetQuery;
-import masterdataset.Tweet;
-import masterdataset.TweetStructure;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
-import org.mortbay.jetty.Connector;
-import utils.Utils;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
 
-import static masterdataset.DataStore.ingestPail;
-import static masterdataset.DataStore.readTweet;
-import static masterdataset.DataStore.writeTweet;
 import static java.lang.Thread.sleep;
 
 public class Main {
@@ -50,57 +30,23 @@ public class Main {
 //        int count = db.selectCountFromKey("apple", -1);
 //        int a =1;
 
-//        TopologyBuilder builder = new TopologyBuilder();
-//        builder.setSpout("tweet_spout", new TweetSpout(), 1);
-//        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
-//        builder.setBolt("count_bolt", new CountBolt(), 4).fieldsGrouping("sentiment_bolt", new Fields("keyword", "sentiment"));
-//        LocalCluster cluster = new LocalCluster();
-//        Config conf = new Config();
-//        conf.setDebug(true);
-//        cluster.submitTopology("tweetp", conf, builder.createTopology());
-//        sleep(1000000);
-//        cluster.shutdown();
+        FileSystem fs = DataStore.configureHDFS();
+        String filePath = "tweet/newData/newTweet.txt";
+        System.out.println(DataStore.readFromHdfs(fs, filePath));
+//        DataStore.deleteFromHdfs(fs, filePath);
+        System.out.println(DataStore.readFromHdfs(fs, filePath));
 
-//        //tweet folder must be deleted at each execution
-//        DataStore ds = new DataStore();
-//        // Hadoop fs configuration
-//        Configuration conf = new Configuration();
-//        conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
-//        FileSystem fs = FileSystem.get(conf);
-//        if (fs.exists(new Path("hdfs://localhost:9000/user/ettore/tweet/data")) &&
-//                fs.exists(new Path("hdfs://localhost:9000/user/ettore/tweet/newData"))) {
-//
-//            fs.delete(new Path("hdfs://localhost:9000/user/ettore/tweet"), true);
-//        }
-//
-//
-//        String path = "hdfs://localhost:9000/user/ettore/tweet/data";
-//        Pail tweetPail = Pail.create(path, new TweetStructure());
-//        writeTweet(tweetPail, "Team Giannis", 1502019, 192133);
-//        readTweet(path);
-//
-//        String newpath = "hdfs://localhost:9000/user/ettore/tweet/newData";
-//        Pail newPail = Pail.create(newpath, new TweetStructure());
-//        writeTweet(newPail, "This isn't good", 13022019, 155849);
-//        readTweet(newpath);
-//
-//        System.out.println("Data folder: ");
-//        ingestPail(tweetPail, newPail);
-//        readTweet(path);
-
-//        DataStore ds = new DataStore();
-//        ds.compressPail(); // native-hadoop code error. The files are generated properly. Maybe a local error. Maybe unuseful.
-//        ds.writeCompressedTweet("./tweet/compressed", "Ciao mondo", 18022019, 185344);
-//
-//        File file = new File("./db.txt");
-//        FileInputStream fis = new FileInputStream(file);
-//        InputStreamReader isr = new InputStreamReader(fis);
-//        BufferedReader br = new BufferedReader(isr);
-//        while (br.readLine() != null) {
-//            String[] wrd = br.readLine().split(",");
-//            ds.writeTweet(tweetPail, path, wrd[2], Integer.parseInt(wrd[0]), Integer.parseInt(wrd[1]));
-//        }
-//        br.close();
+        TopologyBuilder builder = new TopologyBuilder();
+        builder.setSpout("tweet_spout", new TweetSpout(), 1);
+        builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
+        builder.setBolt("count_bolt", new CountBolt(), 4).fieldsGrouping("sentiment_bolt", new Fields("keyword", "sentiment"));
+        LocalCluster cluster = new LocalCluster();
+        Config conf = new Config();
+        conf.setDebug(true);
+        cluster.submitTopology("tweetp", conf, builder.createTopology());
+        sleep(1000000);
+        cluster.shutdown();
+        System.out.println(DataStore.readFromHdfs(fs, "tweet/newData/newTweet.txt"));
 
 //        MDatasetQuery mq = new MDatasetQuery();
 //
@@ -124,10 +70,10 @@ public class Main {
 //        mq.tweetProcessing(tweet, "batchtable");
 //        client.close();
 
-        LAexec la = new LAexec("db.txt");
-//        la.startLA((int) (Utils.countFileLines("db.txt") * 0.7));
-        la.startLA(10);
-        List batch = la.getBatch();
-        List fast = la.getFast();
+//        LAexec la = new LAexec("db.txt");
+////        la.startLA((int) (Utils.countFileLines("db.txt") * 0.7));
+//        la.startLA(0);
+//        List batch = la.getBatch();
+//        List fast = la.getFast();
     }
 }

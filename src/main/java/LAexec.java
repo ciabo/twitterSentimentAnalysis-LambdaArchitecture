@@ -18,7 +18,7 @@ public class LAexec {
         try {
             BufferedReader br = new BufferedReader(new FileReader(filename));
 //            BufferedWriter bwB = new BufferedWriter(new FileWriter("dbBatch.txt"));
-//            BufferedWriter bwF = new BufferedWriter(new FileWriter("dbFast.txt"));
+//            BufferedWriter bwF = new BufferedWriter(new FileWriter("dbFast15.txt"));
             String line;
             int count = 0;
             while ((line = br.readLine()) != null && count < 15) {
@@ -32,11 +32,11 @@ public class LAexec {
 //                    bwF.append(tweet+"\n");
                 }
                 count++;
-//                bwB.close();
-//                bwF.close();
             }
+//            bwB.close();
+//            bwF.close();
         } catch (IOException e) {
-            System.out.println("Error with file %s" + filename);
+            System.out.println("Error with file " + filename);
         }
     }
 
@@ -47,5 +47,4 @@ public class LAexec {
     public List<String> getFast() {
         return fast;
     }
-
 }
