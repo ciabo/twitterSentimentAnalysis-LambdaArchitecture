@@ -103,8 +103,8 @@ public class Main {
         MDatasetQuery mq = new MDatasetQuery();
         CassandraConnector client = new CassandraConnector();
         client.connect("127.0.0.1", null);
-        SentimentRepository smR = new SentimentRepository(client.getSession());
-        List smr = Arrays.asList(smR);
+        MDatasetQuery.smr = new SentimentRepository(client.getSession());
+//        MDatasetQuery.smr = Arrays.asList("Ehi merda");
         List tweet = Arrays.asList(Arrays.asList("Go gsw"),
                 Arrays.asList("Shame!"),
                 Arrays.asList("Tomorrow will be a good day"),
@@ -114,6 +114,6 @@ public class Main {
                 Arrays.asList("New microsoft update is available"),
                 Arrays.asList("Jcascalog it's wonderful!"),
                 Arrays.asList("apple it's wonderful!"));
-        MDatasetQuery.tweetProcessing(tweet, smr);
+        MDatasetQuery.tweetProcessing(tweet);
     }
 }

@@ -9,10 +9,13 @@ import jcascalog.op.Count;
 import java.util.List;
 
 public class MDatasetQuery {
-    public static void tweetProcessing(List tweet, List smr) {
-        Subquery queryresult = new Subquery("?keyword", "?sentiment", "?count")
-                .predicate(smr, "_", "?smr")
-                .predicate(new QueryResult(), "?keyword", "?sentiment", "?count", "?smr").out("?keyword", "?sentiment", "?count");
+    public static SentimentRepository smr;
+
+    public static void tweetProcessing(List tweet) {
+
+//        Subquery queryresult = new Subquery("?keyword", "?sentiment", "?count")
+//                .predicate(smr, "?smr")
+//                .predicate(new QueryResult(), "?keyword", "?sentiment", "?count", "?smr").out("?keyword", "?sentiment", "?count");
 
         Api.execute(
                 new StdoutTap(),
@@ -20,7 +23,7 @@ public class MDatasetQuery {
                         .predicate(tweet, "?tweet")
                         .predicate(new SentimentAnalysis(), "?tweet").out("?keyword", "?sentiment")
                         .predicate(new Count(), "?count")
-                        .predicate(queryresult, "?keyword", "?sentiment", "?count")
+                        .predicate(new QueryResult(), "?keyword", "?sentiment", "?count").out("?keyword", "?sentiment", "?count")
         );
     }
 }
