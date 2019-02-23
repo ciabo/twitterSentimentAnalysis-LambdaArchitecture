@@ -2,6 +2,10 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import com.datastax.driver.core.Session;
+import fastlayer.cassandra.CassandraConnector;
+import fastlayer.cassandra.KeyspaceRepository;
+import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
@@ -9,20 +13,21 @@ import masterdataset.DataStore;
 import org.apache.hadoop.fs.FileSystem;
 
 import java.io.*;
+import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
-//        CassandraConnector client = new CassandraConnector();
-//        client.connect("127.0.0.1", null);
-//        Session session = client.getSession();
-//        String keyspaceName = "tweetSentimentAnalysis";
-//        KeyspaceRepository schemaRepository = new KeyspaceRepository(session);
+        CassandraConnector client = new CassandraConnector();
+        client.connect("127.0.0.1", null);
+        Session session = client.getSession();
+        String keyspaceName = "tweetSentimentAnalysis";
+        KeyspaceRepository schemaRepository = new KeyspaceRepository(session);
 //        schemaRepository.createKeyspace(keyspaceName, "SimpleStrategy", 1);
-//        schemaRepository.useKeyspace(keyspaceName);
+        schemaRepository.useKeyspace(keyspaceName);
 //        //create the table
-//        SentimentRepository db = new SentimentRepository(session);
+        SentimentRepository db = new SentimentRepository(session);
 //        db.createTable();
 //        db.updateCount("apple", -1, 15);
 //        db.updateCount("google", 1, 6);
@@ -44,10 +49,13 @@ public class Main {
         Config conf = new Config();
         conf.setDebug(true);
         cluster.submitTopology("tweetp", conf, builder.createTopology());
-        sleep(1000000);
+        sleep(10000);
         cluster.shutdown();
         System.out.println(DataStore.readFromHdfs(fs, "tweet/newData/newTweet.txt"));
-
+        ServingLayer servingLayer = new ServingLayer(db);
+        String[] keywords={"google","apple"};
+        Map<String,Integer> results = servingLayer.getResults(keywords);
+        int a = 1;
 //        MDatasetQuery mq = new MDatasetQuery();
 //
 //        CassandraConnector client = new CassandraConnector();

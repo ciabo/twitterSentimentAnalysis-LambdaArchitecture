@@ -33,7 +33,10 @@ public class SentimentRepository {
         final String query = sb.toString();
         ResultSet rs = session.execute(query);
         Row r = rs.one();
-        return r.getInt("count");
+        if(r==null)
+             return 0;
+        else
+            return r.getInt("count");
     }
 
     public void updateCount(String tablename, String keyword, int sentiment, int newCount) {

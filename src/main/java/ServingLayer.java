@@ -10,32 +10,32 @@ public class ServingLayer {
 
     SentimentRepository repository;
 
-    public ServingLayer(SentimentRepository repositor){
+    public ServingLayer(SentimentRepository repository){
         this.repository=repository;
     }
 
     public Map<String,Integer> getResults(String[] keywords){
-        final Map<String, Integer> fastMap = new HashMap<String, Integer>();
+        Map<String, Integer> map = new HashMap<String, Integer>();
         for(int i=0; i <keywords.length; i++) {
             for (int j = -1; j <= 1; j++) {
                 String sentiment=Integer.toString(j);
-                String keyword_sentiment = keywords[i] + "-" + sentiment;
+                String keyword_sentiment = keywords[i] + " - " + sentiment;
                 int count=repository.selectCountFromKey("fasttable",keywords[i], j);
-                fastMap.put(keyword_sentiment,count);
+                map.put(keyword_sentiment,count);
             }
         }
 
         for(int i=0; i <keywords.length; i++) {
             for (int j = -1; j <= 1; j++) {
                 String sentiment=Integer.toString(j);
-                String keyword_sentiment = keywords[i] + "-" + sentiment;
-                int count=repository.selectCountFromKey("fasttable",keywords[i], j);
-                int val = fastMap.get(keyword_sentiment);
-                int newVal = val+count;
-                fastMap.put(keyword_sentiment,newVal);
+                String keyword_sentiment = keywords[i] + " - " + sentiment;
+                int count=repository.selectCountFromKey("batchtable",keywords[i], j);
+                int val = map.get(keyword_sentiment);
+                int newVal = val + count;
+                map.put(keyword_sentiment,newVal);
             }
         }
-        return fastMap;
+        return map;
 
     }
 }
