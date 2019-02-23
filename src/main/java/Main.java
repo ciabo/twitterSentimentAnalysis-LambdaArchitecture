@@ -10,37 +10,49 @@ import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
+import masterdataset.MDatasetQuery;
 import org.apache.hadoop.fs.FileSystem;
+import utils.Utils;
 
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
+        //cassandra cluster init
         CassandraConnector client = new CassandraConnector();
         client.connect("127.0.0.1", null);
         Session session = client.getSession();
+
+        // keyspace of batch and fast layer
         String keyspaceName = "tweetSentimentAnalysis";
         KeyspaceRepository schemaRepository = new KeyspaceRepository(session);
-//        schemaRepository.createKeyspace(keyspaceName, "SimpleStrategy", 1);
         schemaRepository.useKeyspace(keyspaceName);
-//        //create the table
-        SentimentRepository db = new SentimentRepository(session);
-//        db.createTable();
-//        db.updateCount("apple", -1, 15);
-//        db.updateCount("google", 1, 6);
-//        db.updateCount("microsoft", -1, 4);
-//        int count = db.selectCountFromKey("apple", -1);
-//        int a =1;
+        // create fastlayer table
+        SentimentRepository dbF = new SentimentRepository(session);
 
+        //generate tweet to jCascalog
+        List tweet = Utils.createListofTweet("dbFast15.txt");
+
+        // create batchlayer table
+        MDatasetQuery mq = new MDatasetQuery();
+        SentimentRepository dbB = new SentimentRepository(session);
+        mq.setandCreateSentimentRepo(dbB, "batchtable");
+
+        // put tweet processing in batchtable
+        mq.tweetProcessing(tweet);
+
+        // configure and set file to store new fastlayer's tweet
         FileSystem fs = DataStore.configureHDFS();
         String filePath = "tweet/newData/newTweet.txt";
-        System.out.println(DataStore.readFromHdfs(fs, filePath));
-//        DataStore.deleteFromHdfs(fs, filePath);
-        System.out.println(DataStore.readFromHdfs(fs, filePath));
+//        System.out.println(DataStore.readFromHdfs(fs, filePath));
+        DataStore.deleteFromHdfs(fs, filePath);
+//        System.out.println(DataStore.readFromHdfs(fs, filePath));
 
+        // storm init
         TopologyBuilder builder = new TopologyBuilder();
         builder.setSpout("tweet_spout", new TweetSpout(), 1);
         builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
@@ -48,40 +60,27 @@ public class Main {
         LocalCluster cluster = new LocalCluster();
         Config conf = new Config();
         conf.setDebug(true);
+
+        // storm execution
         cluster.submitTopology("tweetp", conf, builder.createTopology());
         sleep(10000);
         cluster.shutdown();
-        System.out.println(DataStore.readFromHdfs(fs, "tweet/newData/newTweet.txt"));
-        ServingLayer servingLayer = new ServingLayer(db);
-        String[] keywords={"google","apple"};
-        Map<String,Integer> results = servingLayer.getResults(keywords);
-        int a = 1;
-//        MDatasetQuery mq = new MDatasetQuery();
-//
-//        CassandraConnector client = new CassandraConnector();
-//        client.connect("127.0.0.1", null);
-//        mq.setSentimentRepo(new SentimentRepository(client.getSession()));
-//
-//        KeyspaceRepository keyspace = new KeyspaceRepository(client.getSession());
-//        keyspace.createKeyspace("sentimentAnalysis", "SimpleStrategy", 1);
-//        keyspace.useKeyspace("sentimentAnalysis");
-//
-//        List tweet = Arrays.asList(Arrays.asList("Go gsw"),
-//                Arrays.asList("Shame!"),
-//                Arrays.asList("Tomorrow will be a good day"),
-//                Arrays.asList("Tomorrow apple will die"),
-//                Arrays.asList("Today google shows a new product"),
-//                Arrays.asList("CEO of microsoft is Bill Gates"),
-//                Arrays.asList("New microsoft update is available"),
-//                Arrays.asList("Jcascalog it's wonderful!"),
-//                Arrays.asList("apple it's wonderful!"));
-//        mq.tweetProcessing(tweet, "batchtable");
-//        client.close();
+        System.out.println("\nNew tweet stored in dfs:");
+        System.out.println(DataStore.readFromHdfs(fs, filePath));
 
-//        LAexec la = new LAexec("db.txt");
-////        la.startLA((int) (Utils.countFileLines("db.txt") * 0.7));
-//        la.startLA(0);
-//        List batch = la.getBatch();
-//        List fast = la.getFast();
+        ServingLayer servingLayer = new ServingLayer(dbF);
+        String[] keywords = {"google", "apple", "microsoft"};
+
+        Map<String, Integer> results = servingLayer.getResults(keywords);
+        System.out.println("QUERY RESULTS");
+        System.out.println("------------------");
+        for (String key : results.keySet())
+            System.out.println(key + " | " + results.get(key));
+        System.out.println("------------------");
+
+        // drop table
+        dbF.deleteTable("fasttable");
+        dbB.deleteTable("bathctable");
+
     }
 }

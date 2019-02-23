@@ -36,6 +36,7 @@ public class SentimentBolt extends BaseBasicBolt {
         if (keywordPresent == true) {
             //NLP.init(); //probably the init must be put in the class initializer because is slow
             int sentiment = NLP.findSentiment(tweet);
+            i--;
             collector.emit(new Values(keywords[i], sentiment));
         }
     }

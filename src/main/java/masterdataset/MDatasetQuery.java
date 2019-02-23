@@ -11,16 +11,12 @@ import java.util.List;
 public class MDatasetQuery {
     static SentimentRepository smr;
 
-    public void setSentimentRepo(SentimentRepository smr) {
+    public void setandCreateSentimentRepo(SentimentRepository smr, String tablename) {
         MDatasetQuery.smr = smr;
+        MDatasetQuery.smr.createTable(tablename);
     }
 
-    public void createTable(String tablename) {
-        smr.createTable(tablename);
-    }
-
-    public void tweetProcessing(List tweet, String tablename) {
-        smr.createTable(tablename);
+    public void tweetProcessing(List tweet) {
         Api.execute(
                 new StdoutTap(),
                 new Subquery("?keyword", "?sentiment", "?count")
