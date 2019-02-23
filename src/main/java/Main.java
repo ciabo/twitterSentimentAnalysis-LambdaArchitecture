@@ -78,9 +78,9 @@ public class Main {
             System.out.println(key + " | " + results.get(key));
         System.out.println("------------------");
 
-        // drop table
-        dbF.deleteTable("fasttable");
-        dbB.deleteTable("bathctable");
+//        // drop table
+//        dbF.deleteTable("fasttable");
+//        dbB.deleteTable("bathctable");
 
     }
 }
