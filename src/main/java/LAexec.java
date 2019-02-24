@@ -57,26 +57,16 @@ public class LAexec {
     }
 
     public void executeLA(FileSystem fs, TweetSpout spout) throws IOException, InterruptedException {
-        // lo spout mi spara i tweet e me li salvo in un file sul dfs <- fatto
-        // faccio uno snapshot del file lo salvo nel file tweet.txt e
-        // ricalcolo i tweet con cascalog(tweetProcessing). Una volta
-        // fatto lo snapshot posso cancellare i tweet in questione dal
-        // file newTweet.txt.
-        // Passato un certo tempo faccio il drop della batchtable e
-        // ricalcolo il risultato su tutti i tweet in tweet.txt
 
-        int numFile = spout.getnumFile();
+        int numFile = TweetSpout.getnumFile();
         if (DataStore.readFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt").size() != 0) {
-//            spout.setNumFile(spout.getnumFile() == 1 ? 2 : 1);
-            spout.setSnap(!spout.getSnap());
+            TweetSpout.setNumFile(TweetSpout.getnumFile() == 1 ? 2 : 1);
             List tweets = DataStore.readFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt");
-            System.out.println("Tweet sended to batch from file " + spout.getnumFile() + numFile + ":");
-            System.out.println(tweets);
+            System.out.println("\n" + tweets.size() + " tweets sended from " + numFile + ": " + tweets + "\n");
             mq.tweetProcessing(tweets);
-            sleep(8000);
             DataStore.createAppendHDFS(fs, "tweet/batchTweet/tweet.txt", tweets);
             DataStore.deleteFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt");
-//            spout.setSnap(!spout.getSnap());
+            tweets.clear();
         }
     }
 

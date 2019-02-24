@@ -22,8 +22,7 @@ public class TweetSpout extends BaseRichSpout {
     private List<String> records;
     private int dbcounter;
     private FileSystem fs;
-    private Boolean snap = false;
-    private int numFile = 1;
+    private static int numFile = 1;
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
@@ -57,12 +56,8 @@ public class TweetSpout extends BaseRichSpout {
         if (dbcounter < records.size() - 1) {
             dbcounter++;
             try {
-                if (snap) {
-                    setNumFile(2);
-                    DataStore.createAppendHDFS(fs, "tweet/newData/newTweet" + numFile + ".txt", line);
-                }
-                setNumFile(1);
-                DataStore.createAppendHDFS(fs, "tweet/newData/newTweet" + numFile + ".txt", line);
+                System.out.println("Writing on " + TweetSpout.getnumFile() + ".........");
+                DataStore.createAppendHDFS(fs, "tweet/newData/newTweet" + TweetSpout.getnumFile() + ".txt", line);
             } catch (IOException e) {
                 System.out.println("Error while appending newTweet" + numFile);
             }
@@ -70,19 +65,11 @@ public class TweetSpout extends BaseRichSpout {
         }
     }
 
-    public int getnumFile() {
-        return numFile;
+    public static int getnumFile() {
+        return TweetSpout.numFile;
     }
 
-    public void setNumFile(int v) {
-        this.numFile = v;
-    }
-
-    public Boolean getSnap() {
-        return snap;
-    }
-
-    public void setSnap(Boolean snap) {
-        this.snap = snap;
+    public static void setNumFile(int v) {
+        TweetSpout.numFile = v;
     }
 }

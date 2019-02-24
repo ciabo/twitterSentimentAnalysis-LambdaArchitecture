@@ -24,9 +24,10 @@ import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
-        System.out.println("Drop tables? (true/false)");
-        Scanner sc = new Scanner(System.in);
-        Boolean drop = sc.nextBoolean();
+//        System.out.println("Drop tables? (true/false)");
+//        Scanner sc = new Scanner(System.in);
+//        boolean drop = sc.nextBoolean();
+        boolean drop = true;
 
         //cassandra cluster init
         CassandraConnector client = new CassandraConnector();
@@ -73,8 +74,7 @@ public class Main {
 
         // put tweets processing in batchtable
         LAexec la = new LAexec(mq);
-        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iteration is enough
-            sleep(1000);
+        for (int i = 0; i < 4; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
             la.executeLA(fs, spout);
             sleep(15000); //almost 4 tweets
         }
