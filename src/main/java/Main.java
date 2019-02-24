@@ -17,11 +17,17 @@ import utils.Utils;
 import java.io.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
 
 import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
+        System.out.println("Drop tables? (true/false)");
+        Scanner sc = new Scanner(System.in);
+        Boolean drop = sc.nextBoolean();
+
         //cassandra cluster init
         CassandraConnector client = new CassandraConnector();
         client.connect("127.0.0.1", null);
@@ -34,27 +40,28 @@ public class Main {
         // create fastlayer table
         SentimentRepository dbF = new SentimentRepository(session);
 
-        //generate tweet to jCascalog
-        List tweet = Utils.createListofTweet("dbFast15.txt");
-
         // create batchlayer table
         MDatasetQuery mq = new MDatasetQuery();
         SentimentRepository dbB = new SentimentRepository(session);
         mq.setandCreateSentimentRepo(dbB, "batchtable");
 
-        // put tweet processing in batchtable
-        mq.tweetProcessing(tweet);
+        // drop table
+        if (drop) {
+            dbF.deleteTable("fasttable");
+            dbB.deleteTable("bathctable");
+            dbF.createTable("fasttable");
+            dbF.createTable("batchtable");
+        }
 
-        // configure and set file to store new fastlayer's tweet
+        // configure and set file to store(batch) new fastlayer's tweets
         FileSystem fs = DataStore.configureHDFS();
-        String filePath = "tweet/newData/newTweet.txt";
-//        System.out.println(DataStore.readFromHdfs(fs, filePath));
+        String filePath = "/user/ettore/tweet/batchTweet/tweet.txt";
         DataStore.deleteFromHdfs(fs, filePath);
-//        System.out.println(DataStore.readFromHdfs(fs, filePath));
 
         // storm init
         TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("tweet_spout", new TweetSpout(), 1);
+        TweetSpout spout = new TweetSpout();
+        builder.setSpout("tweet_spout", spout, 1);
         builder.setBolt("sentiment_bolt", new SentimentBolt(), 4).shuffleGrouping("tweet_spout");
         builder.setBolt("count_bolt", new CountBolt(), 4).fieldsGrouping("sentiment_bolt", new Fields("keyword", "sentiment"));
         LocalCluster cluster = new LocalCluster();
@@ -63,24 +70,31 @@ public class Main {
 
         // storm execution
         cluster.submitTopology("tweetp", conf, builder.createTopology());
-        sleep(10000);
+
+        // put tweets processing in batchtable
+        LAexec la = new LAexec(mq);
+        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iteration is enough
+            sleep(1000);
+            la.executeLA(fs, spout);
+            sleep(15000); //almost 4 tweets
+        }
+
         cluster.shutdown();
-        System.out.println("\nNew tweet stored in dfs:");
-        System.out.println(DataStore.readFromHdfs(fs, filePath));
+        System.out.println("\nNew tweets stored in dfs:");
+        List filecontent = DataStore.readFromHdfs(fs, filePath);
+        for (Object o : filecontent)
+            System.out.println(o);
+        System.out.println("Number of tweets: " + filecontent.size());
 
         ServingLayer servingLayer = new ServingLayer(dbF);
         String[] keywords = {"google", "apple", "microsoft"};
 
         Map<String, Integer> results = servingLayer.getResults(keywords);
+        Map<String, Integer> treeMap = new TreeMap<String, Integer>(results); // sort by key
         System.out.println("QUERY RESULTS");
         System.out.println("------------------");
-        for (String key : results.keySet())
-            System.out.println(key + " | " + results.get(key));
+        for (String key : treeMap.keySet())
+            System.out.println(key + " | " + treeMap.get(key));
         System.out.println("------------------");
-
-//        // drop table
-//        dbF.deleteTable("fasttable");
-//        dbB.deleteTable("bathctable");
-
     }
 }

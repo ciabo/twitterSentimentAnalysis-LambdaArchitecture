@@ -11,6 +11,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DataStore {
     public static FileSystem configureHDFS() {
@@ -51,19 +54,26 @@ public class DataStore {
         return fs;
     }
 
-    public static String readFromHdfs(FileSystem fileSystem, String filePath) {
+    public static FileSystem createAppendHDFS(FileSystem fs, String filePath, List<List> tweet) throws IOException {
+        for (int i = 0; i < tweet.size(); i++) {
+            createAppendHDFS(fs, filePath, tweet.get(i).get(0).toString());
+        }
+        return fs;
+    }
+
+    public static List readFromHdfs(FileSystem fileSystem, String filePath) {
         Path hdfsPath = new Path(filePath);
-        StringBuilder fileContent = new StringBuilder();
+        List fileContent = new ArrayList();
         try {
             BufferedReader bfr = new BufferedReader(new InputStreamReader(fileSystem.open(hdfsPath)));
             String str;
             while ((str = bfr.readLine()) != null) {
-                fileContent.append(str + "\n");
+                fileContent.add(Arrays.asList(str));
             }
         } catch (IOException ex) {
-            System.out.println("----------Could not read from HDFS---------");
+            System.out.println("----------Could not read from HDFS " + filePath + "---------");
         }
-        return fileContent.toString();
+        return fileContent;
     }
 
     public static void deleteFromHdfs(FileSystem fs, String filePath) {
