@@ -41,8 +41,6 @@ public class CountBolt extends BaseBasicBolt {
     public void execute(Tuple tuple, BasicOutputCollector collector) {
         String keyword = tuple.getStringByField("keyword");
         int sentiment = tuple.getIntegerByField("sentiment");
-        int count = db.selectCountFromKey(tablename, keyword, sentiment);
-        count++;
-        db.updateCount(tablename, keyword, sentiment, count);
+        db.addToCount(tablename, keyword, sentiment, 1);
     }
 }

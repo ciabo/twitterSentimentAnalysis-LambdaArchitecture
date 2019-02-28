@@ -16,7 +16,7 @@ public class SentimentRepository {
                 .append(tablename).append("(")
                 .append("keyword text, ")
                 .append("sentiment int,")
-                .append("count int,")
+                .append("count counter,")
                 .append("PRIMARY KEY (keyword, sentiment) );");
         final String query = sb.toString();
         session.execute(query);
@@ -44,6 +44,34 @@ public class SentimentRepository {
                 .append(tablename)
                 .append(" SET count = ")
                 .append(newCount)
+                .append(" WHERE keyword = '")
+                .append(keyword)
+                .append("' AND sentiment = ")
+                .append(sentiment)
+                .append(";");
+        final String query = sb.toString();
+        session.execute(query);
+    }
+
+    public void addToCount(String tablename, String keyword, int sentiment, int value){
+        StringBuilder sb = new StringBuilder("UPDATE ")
+                .append(tablename)
+                .append(" SET count = count + ")
+                .append(value)
+                .append(" WHERE keyword = '")
+                .append(keyword)
+                .append("' AND sentiment = ")
+                .append(sentiment)
+                .append(";");
+        final String query = sb.toString();
+        session.execute(query);
+    }
+
+    public void substractToCount(String tablename, String keyword, int sentiment, int value){
+        StringBuilder sb = new StringBuilder("UPDATE ")
+                .append(tablename)
+                .append(" SET count = count - ")
+                .append(value)
                 .append(" WHERE keyword = '")
                 .append(keyword)
                 .append("' AND sentiment = ")
