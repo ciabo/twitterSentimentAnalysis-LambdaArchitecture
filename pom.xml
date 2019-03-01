@@ -9,12 +9,12 @@
     <version>1.0-SNAPSHOT</version>
 
     <build>
-        <testSourceDirectory>src/test</testSourceDirectory>
         <testResources>
             <testResource>
-                <directory>src/test/resoures</directory>
+                <directory>src/test/resources</directory>
             </testResource>
         </testResources>
+        <testSourceDirectory>src/test</testSourceDirectory>
     </build>
     <repositories>
         <repository>
