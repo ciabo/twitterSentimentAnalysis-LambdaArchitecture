@@ -114,7 +114,7 @@ public class LATest {
         System.out.println("------------------");
         for (String k : keywords) {
             for (int s = -1; s <= 1; s++) {
-                count += db.selectCountFromKey("fasttable", k, s);
+                count += db.selectCountFromKey("batchtable", k, s);
             }
         }
         assertEquals(9, count);
