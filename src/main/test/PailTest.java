@@ -1,13 +1,12 @@
 import com.backtype.hadoop.pail.Pail;
-import junit.framework.TestCase;
 import masterdataset.DataStore;
 import masterdataset.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.*;
+import utils.Utils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class PailTest {
@@ -16,13 +15,13 @@ public class PailTest {
     private static Pail tweetPail;
     private static Pail newPail;
     private static FileSystem fs;
-    private static List<String> fulltweetB;
-    private static List<String> fulltweetF;
+    private static String line1;
+    private static String line2;
 
     @BeforeClass
     public static void setUp() throws IOException {
-        fulltweetB = Arrays.asList("02032019", "120822", "Sunny ddaaaaayyyy!!");
-        fulltweetF = Arrays.asList("04032018", "121333", "So sad this situation");
+        line1 = "02032019,120822,Sunny ddaaaaayyyy!!";
+        line2 = "04032018,121333,So sad this situation";
         fs = DataStore.configureHDFS();
         fs.delete(new Path("/user/ettore/pail"), true);
         tweetPail = Pail.create(path, new TweetStructure());
@@ -43,6 +42,7 @@ public class PailTest {
 
     @Test
     public void testBatchPailList() throws IOException {
+        List<String> fulltweetB = Utils.generateTweet(line1);
         DataStore.writeTweet(tweetPail, fulltweetB.get(0), fulltweetB.get(1), fulltweetB.get(2));
         DataStore.readTweet(path);
     }
@@ -56,6 +56,7 @@ public class PailTest {
 
     @Test
     public void testNewDataPailList() throws IOException {
+        List<String> fulltweetF = Utils.generateTweet(line2);
         DataStore.writeTweet(newPail, fulltweetF.get(0), fulltweetF.get(1), fulltweetF.get(2));
         DataStore.readTweet(newpath);
     }
