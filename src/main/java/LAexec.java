@@ -2,6 +2,7 @@ import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
+import org.apache.hadoop.fs.Path;
 import org.apache.kerby.kerberos.kerb.crypto.util.Md4;
 import utils.Utils;
 import org.apache.hadoop.fs.FileSystem;
@@ -10,8 +11,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
 
 public class LAexec {
     private List batch = new ArrayList();
@@ -58,9 +57,10 @@ public class LAexec {
 
     public void executeLA(FileSystem fs, TweetSpout spout) throws IOException, InterruptedException {
 
-        int numFile = TweetSpout.getnumFile();
+        int numFile = spout.getMainFolder() ? 1 : 2;
         if (DataStore.readFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt").size() != 0) {
-            TweetSpout.setNumFile(TweetSpout.getnumFile() == 1 ? 2 : 1);
+            fs.createSnapshot(new Path("tweet"),"culosnaphot");
+            spout.changeFolder();
             List tweets = DataStore.readFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt");
             System.out.println("\n" + tweets.size() + " tweets sended from " + numFile + ": " + tweets + "\n");
             mq.tweetProcessing(tweets);

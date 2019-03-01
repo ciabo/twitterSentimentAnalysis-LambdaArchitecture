@@ -56,7 +56,7 @@ public class Main {
 
         // configure and set file to store(batch) new fastlayer's tweets
         FileSystem fs = DataStore.configureHDFS();
-        String filePath = "/user/ettore/tweet/batchTweet/tweet.txt";
+        String filePath = "/user/luca/tweet/batchTweet/tweet.txt";
         DataStore.deleteFromHdfs(fs, filePath);
 
         // storm init
@@ -71,7 +71,7 @@ public class Main {
 
         // storm execution
         cluster.submitTopology("tweetp", conf, builder.createTopology());
-
+        sleep(15000);
         // put tweets processing in batchtable
         LAexec la = new LAexec(mq);
         for (int i = 0; i < 4; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough

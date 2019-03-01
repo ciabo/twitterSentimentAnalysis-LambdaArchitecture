@@ -22,12 +22,12 @@ public class TweetSpout extends BaseRichSpout {
     private List<String> records;
     private int dbcounter;
     private FileSystem fs;
-    private static int numFile = 1;
+    private boolean mainFolder;
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         this.fs = DataStore.configureHDFS();
-
+        this.mainFolder=false;
         this.collector = collector;
         this.dbcounter = 0;
         String filename = "dbFast15.txt";
@@ -56,20 +56,32 @@ public class TweetSpout extends BaseRichSpout {
         if (dbcounter < records.size() - 1) {
             dbcounter++;
             try {
-                System.out.println("Writing on " + TweetSpout.getnumFile() + ".........");
-                DataStore.createAppendHDFS(fs, "tweet/newData/newTweet" + TweetSpout.getnumFile() + ".txt", line);
+                if(this.mainFolder) {
+                    System.out.println("Writing on 1.........");
+                    DataStore.createAppendHDFS(fs, "tweet/newData/newTweet1.txt", line);
+                }else{
+                    System.out.println("Writing on 2.........");
+                    DataStore.createAppendHDFS(fs, "tweet/newData/newTweet2.txt", line);
+                }
             } catch (IOException e) {
-                System.out.println("Error while appending newTweet" + numFile);
+                System.out.println("Error while appending newTweet");
             }
             collector.emit(new Values(line));
         }
     }
 
-    public static int getnumFile() {
-        return TweetSpout.numFile;
+    public void changeFolder(){
+        if(mainFolder) {
+            this.mainFolder = false;
+        }else{
+            this.mainFolder=true;
+        }
+        int a =1;
     }
 
-    public static void setNumFile(int v) {
-        TweetSpout.numFile = v;
+    public boolean getMainFolder(){
+        return this.mainFolder;
     }
+
+
 }
