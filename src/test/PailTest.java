@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class PailTest {
-    private static String path = "hdfs://localhost:9000/user/ettore/pail/tweet/data";
-    private static String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
+    private static String path = "hdfs://localhost:9000/user/ettore/testpail/tweet/data";
+    private static String newpath = "hdfs://localhost:9000/user/ettore/testpail/tweet/newData";
     private static Pail tweetPail;
     private static Pail newPail;
     private static FileSystem fs;
@@ -27,14 +27,14 @@ public class PailTest {
         line1 = "02032019,120822,Sunny ddaaaaayyyy!!";
         line2 = "04032018,121333,So sad this situation";
         fs = DataStore.configureHDFS();
-        fs.delete(new Path("/user/ettore/pail"), true);
+        fs.delete(new Path("/user/ettore/testpail"), true);
         tweetPail = Pail.create(path, new TweetStructure());
         newPail = Pail.create(newpath, new TweetStructure());
     }
 
     @AfterClass
     public static void tearDown() throws IOException {
-        fs.delete(new Path("/user/ettore/pail"), true);
+        fs.delete(new Path("/user/ettore/testpail"), true);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class PailTest {
 
     @Test
     public void testIngestion() throws IOException {
-        DataStore.ingestPail(tweetPail, newPail, fs); // It uses Map Reduce
+        DataStore.ingestPail(tweetPail, newPail, fs, "test"); // It uses Map Reduce
         System.out.println("\nData folder: ");
         DataStore.readTweet(path);
         System.out.print("\nNew data folder: ");

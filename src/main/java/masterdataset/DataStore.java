@@ -79,11 +79,11 @@ public class DataStore {
         dst.consolidate();
     }
 
-    public static void ingestPail(Pail tweetPail, Pail newPail, FileSystem fs) throws IOException {
-        fs.delete(new Path("/user/ettore/pail/tweet/swa"), true);
-        fs.mkdirs(new Path("/user/ettore/pail/tweet/swa"));
+    public static void ingestPail(Pail tweetPail, Pail newPail, FileSystem fs, String test) throws IOException {
+        fs.delete(new Path("/user/ettore/" + test + "pail/tweet/swa"), true);
+        fs.mkdirs(new Path("/user/ettore/" + test + "pail/tweet/swa"));
 
-        Pail snapShot = newPail.snapshot("hdfs://localhost:9000/user/ettore/pail/tweet/swa/newData");
+        Pail snapShot = newPail.snapshot("hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/swa/newData");
         appendTweet(newPail, tweetPail);
         newPail.deleteSnapshot(snapShot);
     }

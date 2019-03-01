@@ -66,9 +66,7 @@ public class TweetSpout extends BaseRichSpout {
             try {
                 System.out.println("Writing on newTweet");
                 List<String> fulltweet = utils.Utils.generateTweet(line);
-                System.out.println(fulltweet.get(0) + " " + fulltweet.get(1) + " " + fulltweet.get(2) + " ");
-//                DataStore.writeTweet(newTweetPail, fulltweet.get(0), fulltweet.get(1), fulltweet.get(2));
-                DataStore.writeTweet(newTweetPail, "03032019","165722","Ciao dallo spout");
+                DataStore.writeTweet(newTweetPail, fulltweet.get(0), fulltweet.get(1), fulltweet.get(2));
             } catch (IOException e) {
                 System.out.println("Error while appending newTweet");
             }

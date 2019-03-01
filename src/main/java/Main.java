@@ -43,7 +43,6 @@ public class Main {
         // create fastlayer table
         SentimentRepository db = SentimentRepository.getInstance(session);
 
-
         // drop table
         if (drop) {
             db.deleteTable("fasttable");
@@ -54,7 +53,6 @@ public class Main {
 
         // configure and set file to store(batch) new fastlayer's tweets
         FileSystem fs = DataStore.configureHDFS();
-        String filePath = "tweet/batchTweet/tweet.txt";
         fs.delete(new Path("/user/ettore/pail/tweet"), true);
 
         // storm init
@@ -83,7 +81,6 @@ public class Main {
         System.out.println("\nNew tweets stored in dfs:");
         List tweets = DataStore.readTweet(batchpath);
         System.out.println("Number of tweets: " + tweets.size());
-
 
         String[] keywords = {"google", "apple", "microsoft"};
 

@@ -4,24 +4,13 @@ import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
 import masterdataset.TweetStructure;
-import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.client.HdfsAdmin;
-import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport;
-import org.apache.kerby.kerberos.kerb.crypto.util.Md4;
 import utils.Utils;
 import org.apache.hadoop.fs.FileSystem;
 
-import javax.xml.crypto.Data;
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
 
 public class LAexec {
     private List batch = new ArrayList();
@@ -34,8 +23,8 @@ public class LAexec {
     public LAexec(MDatasetQuery mq, String batchTweet) {
         this.mq = mq;
         try {
-            tweetPail = Pail.create(batchTweet);
-            newTweetPail = Pail.create(newpath);
+            tweetPail = Pail.create(batchTweet, new TweetStructure());
+            newTweetPail = Pail.create(newpath, new TweetStructure());
         } catch (IOException e) {
             System.out.println("Unable to create bact tweet Pail");
         }
@@ -76,7 +65,7 @@ public class LAexec {
     }
 
     public void executeLA(FileSystem fs) throws IOException {
-        DataStore.ingestPail(tweetPail, newTweetPail, fs);
+        DataStore.ingestPail(tweetPail, newTweetPail, fs, "");
     }
 
     public void recomputeBatch(SentimentRepository repository, FileSystem fs) throws IOException {
