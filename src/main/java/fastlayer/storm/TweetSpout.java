@@ -6,6 +6,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import cascalog.test.RangeOp;
 import com.backtype.hadoop.pail.Pail;
 import com.backtype.support.Utils;
 import masterdataset.DataStore;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class TweetSpout extends BaseRichSpout {
     private SpoutOutputCollector collector;
@@ -58,7 +60,9 @@ public class TweetSpout extends BaseRichSpout {
     }
 
     public void nextTuple() {
-        Utils.sleep(100);
+        Random random = new Random();
+        int millis = random.nextInt(200)+100;
+        Utils.sleep(millis);
         String line = records.get(dbcounter);
         if (dbcounter < records.size() - 1) {
             dbcounter++;
