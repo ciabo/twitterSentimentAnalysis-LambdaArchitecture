@@ -14,8 +14,6 @@ import fastlayer.cassandra.SentimentRepository;
 import java.util.Map;
 
 public class CountBolt extends BaseBasicBolt {
-    private Session session;
-    private KeyspaceRepository schemaRepository;
     private SentimentRepository db;
     private String tablename;
 
@@ -24,18 +22,8 @@ public class CountBolt extends BaseBasicBolt {
     }
 
     public void prepare(Map conf, TopologyContext context) {
-        CassandraConnector client = new CassandraConnector();
-        client.connect("127.0.0.1", null);
-        this.session = client.getSession();
-
-        String keyspaceName = "tweetSentimentAnalysis";
-        schemaRepository = new KeyspaceRepository(session);
-        schemaRepository.createKeyspace(keyspaceName, "SimpleStrategy", 1);
-        schemaRepository.useKeyspace(keyspaceName);
-        //create the table
-        db = new SentimentRepository(session);
         tablename = "fasttable";
-        db.createTable(tablename);
+        db = SentimentRepository.getInstance();
     }
 
     public void execute(Tuple tuple, BasicOutputCollector collector) {
