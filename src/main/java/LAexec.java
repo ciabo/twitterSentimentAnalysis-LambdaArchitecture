@@ -1,24 +1,44 @@
+import com.backtype.hadoop.pail.Pail;
 import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
+import masterdataset.TweetStructure;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.hdfs.client.HdfsAdmin;
+import org.apache.hadoop.hdfs.protocol.SnapshotDiffReport;
 import org.apache.kerby.kerberos.kerb.crypto.util.Md4;
 import utils.Utils;
 import org.apache.hadoop.fs.FileSystem;
 
+import javax.xml.crypto.Data;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class LAexec {
     private List batch = new ArrayList();
     private List fast = new ArrayList();
-    private MDatasetQuery mq = new MDatasetQuery();
+    private MDatasetQuery mq;
+    private Pail tweetPail;
+    private Pail newTweetPail;
+    private String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
 
-    public LAexec(MDatasetQuery mq) {
+    public LAexec(MDatasetQuery mq, String batchTweet) {
         this.mq = mq;
+        try {
+            tweetPail = Pail.create(batchTweet);
+            newTweetPail = Pail.create(newpath);
+        } catch (IOException e) {
+            System.out.println("Unable to create bact tweet Pail");
+        }
     }
 
     public void startLA(int endbatch, String filename) {
@@ -55,25 +75,14 @@ public class LAexec {
         return fast;
     }
 
-    public void executeLA(FileSystem fs, TweetSpout spout) throws IOException, InterruptedException {
-
-        int numFile = spout.getMainFolder() ? 1 : 2;
-        if (DataStore.readFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt").size() != 0) {
-            fs.createSnapshot(new Path("tweet"),"culosnaphot");
-            spout.changeFolder();
-            List tweets = DataStore.readFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt");
-            System.out.println("\n" + tweets.size() + " tweets sended from " + numFile + ": " + tweets + "\n");
-            mq.tweetProcessing(tweets);
-            DataStore.createAppendHDFS(fs, "tweet/batchTweet/tweet.txt", tweets);
-            DataStore.deleteFromHdfs(fs, "tweet/newData/newTweet" + numFile + ".txt");
-            tweets.clear();
-        }
+    public void executeLA(FileSystem fs) throws IOException {
+        DataStore.ingestPail(tweetPail, newTweetPail, fs);
     }
 
-    public void recomputeBatch(SentimentRepository repository, FileSystem fs) {
+    public void recomputeBatch(SentimentRepository repository, FileSystem fs) throws IOException {
         repository.deleteTable("batchtable");
         mq.setandCreateSentimentRepo(repository, "batchtable");
-        List tweets = DataStore.readFromHdfs(fs, "tweet/batchTweet/tweet.txt");
+        List tweets = DataStore.readTweet("pail/tweet/batchTweet/tweet.txt");
         mq.tweetProcessing(tweets);
     }
 }

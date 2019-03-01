@@ -1,16 +1,21 @@
 package masterdataset;
 
+import com.backtype.hadoop.pail.Pail;
 import com.backtype.hadoop.pail.SequenceFileFormat;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
+import org.apache.hadoop.hdfs.client.HdfsAdmin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +25,7 @@ public class DataStore {
         FileSystem fs = null;
         try {
             Configuration conf = new Configuration();
-            conf.set("fs.defaultFS", "hdfs://localhost:9000/user/luca");
+            conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
             conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false"); // TODO: 22/02/19 MAYBE in a cluster with multiple nodes must be true
             conf.setBoolean("dfs.support.append", true);
             fs = FileSystem.get(conf);
@@ -30,59 +35,19 @@ public class DataStore {
         return fs;
     }
 
-    public static FileSystem createAppendHDFS(FileSystem fs, String filePath, String tweet) throws IOException {
-        Path hdfsPath = new Path(filePath);
-        FSDataOutputStream out;
-        Boolean isAppendable = Boolean.valueOf(fs.getConf().get("dfs.support.append"));
-        PrintWriter writer;
-        if (isAppendable) {
-            if (fs.exists(hdfsPath)) {
-                out = fs.append(hdfsPath);
-                writer = new PrintWriter(out);
-                writer.append(tweet + "\n");
-            } else {
-                out = fs.create(hdfsPath);
-                writer = new PrintWriter(out);
-                writer.append(tweet + "\n");
-            }
-            writer.flush();
-            out.hflush();
-            writer.close();
-            out.close();
-        } else
-            System.out.println("----------File " + filePath + " isn't appendable----------");
-        return fs;
-    }
-
-    public static FileSystem createAppendHDFS(FileSystem fs, String filePath, List<List> tweet) throws IOException {
-        for (int i = 0; i < tweet.size(); i++) {
-            createAppendHDFS(fs, filePath, tweet.get(i).get(0).toString());
-        }
-        return fs;
-    }
-
-    public static List readFromHdfs(FileSystem fileSystem, String filePath) {
-        Path hdfsPath = new Path(filePath);
-        List fileContent = new ArrayList();
+    public static HdfsAdmin adminHDFS() throws URISyntaxException {
+        HdfsAdmin dfsAdmin = null;
         try {
-            BufferedReader bfr = new BufferedReader(new InputStreamReader(fileSystem.open(hdfsPath)));
-            String str;
-            while ((str = bfr.readLine()) != null) {
-                fileContent.add(Arrays.asList(str));
-            }
-        } catch (IOException ex) {
-            System.out.println("----------Could not read from HDFS " + filePath + "---------");
-        }
-        return fileContent;
-    }
-
-    public static void deleteFromHdfs(FileSystem fs, String filePath) {
-        try {
-            if (fs.exists(new Path(filePath)))
-                fs.delete(new Path(filePath));
+            Configuration conf = new Configuration();
+            conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
+            conf.set("dfs.permissions.enabled", "false");
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false"); // TODO: 22/02/19 MAYBE in a cluster with multiple nodes must be true
+            conf.setBoolean("dfs.support.append", true);
+            dfsAdmin = new HdfsAdmin(new URI("hdfs://localhost:9000/user/ettore"), conf);
         } catch (IOException e) {
-            System.out.println("----------Unable to delete " + filePath + "----------");
+            System.out.println("Unable to configure fle system!");
         }
+        return dfsAdmin;
     }
 
     public static void closeHDFS(FileSystem fs) {
@@ -91,5 +56,35 @@ public class DataStore {
         } catch (IOException e) {
             System.out.println("----------Unable to close  file system----------");
         }
+    }
+
+    public static void writeTweet(final Pail<Tweet> tweetPail, final String date, final String timestamp, final String tweet) throws IOException {
+        Pail.TypedRecordOutputStream out = tweetPail.openWrite();
+        out.writeObject(new Tweet(date, timestamp, tweet));
+        out.close();
+    }
+
+    public static List readTweet(String path) throws IOException {
+        Pail<Tweet> tweetPail = new Pail<Tweet>(path);
+        List tweets = new ArrayList();
+        for (Tweet t : tweetPail) {
+            System.out.println("Tweet: " + t.getTweet() + " Date: " + t.getDate() + " Time: " + t.getTimestamp());
+            tweets = Arrays.asList(Arrays.asList(t.getDate() + "," + t.getTimestamp() + "," + t.getTweet()));
+        }
+        return tweets;
+    }
+
+    private static void appendTweet(Pail src, Pail dst) throws IOException {
+        dst.absorb(src);
+        dst.consolidate();
+    }
+
+    public static void ingestPail(Pail tweetPail, Pail newPail, FileSystem fs) throws IOException {
+        fs.delete(new Path("/user/ettore/pail/tweet/swa"), true);
+        fs.mkdirs(new Path("/user/ettore/pail/tweet/swa"));
+
+        Pail snapShot = newPail.snapshot("hdfs://localhost:9000/user/ettore/pail/tweet/swa/newData");
+        appendTweet(newPail, tweetPail);
+        newPail.deleteSnapshot(snapShot);
     }
 }

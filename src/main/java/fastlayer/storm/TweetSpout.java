@@ -6,8 +6,10 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import com.backtype.hadoop.pail.Pail;
 import com.backtype.support.Utils;
 import masterdataset.DataStore;
+import masterdataset.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 
 import java.io.BufferedReader;
@@ -22,12 +24,19 @@ public class TweetSpout extends BaseRichSpout {
     private List<String> records;
     private int dbcounter;
     private FileSystem fs;
-    private boolean mainFolder;
+    private static int numFile = 1;
+    private String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
+    Pail newTweetPail;
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         this.fs = DataStore.configureHDFS();
-        this.mainFolder=false;
+        try {
+            newTweetPail = new Pail(newpath);
+        } catch (IOException e) {
+            System.out.println("--------------New Pail not created---------------");
+        }
+
         this.collector = collector;
         this.dbcounter = 0;
         String filename = "dbFast15.txt";
@@ -56,32 +65,18 @@ public class TweetSpout extends BaseRichSpout {
         if (dbcounter < records.size() - 1) {
             dbcounter++;
             try {
-                if(this.mainFolder) {
-                    System.out.println("Writing on 1.........");
-                    DataStore.createAppendHDFS(fs, "tweet/newData/newTweet1.txt", line);
-                }else{
-                    System.out.println("Writing on 2.........");
-                    DataStore.createAppendHDFS(fs, "tweet/newData/newTweet2.txt", line);
-                }
+                System.out.println("Writing on newTweet");
+                List<String> fulltweet = utils.Utils.generateTweet(line);
+//                System.out.println(fulltweet.get(2) + " " + Integer.parseInt(fulltweet.get(0)) + " " + Integer.parseInt(fulltweet.get(1)));
+                DataStore.writeTweet(newTweetPail, fulltweet.get(0), fulltweet.get(1), fulltweet.get(2));
             } catch (IOException e) {
-                System.out.println("Error while appending newTweet");
+                System.out.println("Error while appending newTweet" + numFile);
             }
             collector.emit(new Values(line));
         }
     }
 
-    public void changeFolder(){
-        if(mainFolder) {
-            this.mainFolder = false;
-        }else{
-            this.mainFolder=true;
-        }
-        int a =1;
+    public Pail getPail() {
+        return this.newTweetPail;
     }
-
-    public boolean getMainFolder(){
-        return this.mainFolder;
-    }
-
-
 }
