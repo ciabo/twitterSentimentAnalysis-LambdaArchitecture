@@ -48,5 +48,12 @@ public class Utils {
         }
         return batch;
     }
+
+    public static List generateTweet(String line) {
+        String[] split = line.split(",");
+        String tweet = Utils.createTweet(Arrays.copyOfRange(split, 2, split.length));
+        List<String> fulltweet = Arrays.asList(split[0], split[1], tweet);
+        return fulltweet;
+    }
 }
 

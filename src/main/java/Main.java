@@ -2,6 +2,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import com.backtype.hadoop.pail.Pail;
 import com.datastax.driver.core.Session;
 import fastlayer.cassandra.CassandraConnector;
 import fastlayer.cassandra.KeyspaceRepository;
@@ -11,22 +12,45 @@ import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
+import masterdataset.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.Path;
 import utils.Utils;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.TreeMap;
 
 import static java.lang.Thread.sleep;
 
 public class Main {
-    public static void main(String[] argv) throws IOException, InterruptedException {
-//        System.out.println("Drop tables? (true/false)");
-//        Scanner sc = new Scanner(System.in);
-//        boolean drop = sc.nextBoolean();
+    public static void main(String[] argv) throws IOException, InterruptedException, URISyntaxException {
+////      ----------Pail Test-----------
+
+//        FileSystem fs = DataStore.configureHDFS();
+//        fs.delete(new Path("/user/ettore/pail/tweet"), true);
+//
+//        String path = "hdfs://localhost:9000/user/ettore/pail/tweet/data";
+//        Pail tweetPail = Pail.create(path, new TweetStructure());
+//        DataStore.writeTweet(tweetPail, "1502019", "192133", "Team Giannis");
+//        DataStore.readTweet(path);
+//
+//        String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
+//        Pail newPail = Pail.create(newpath, new TweetStructure());
+//        DataStore.writeTweet(newPail, "13022019", "155849", "This isn't good");
+//        DataStore.readTweet(newpath);
+//
+//        System.out.println("Data folder: ");
+//        DataStore.ingestPail(tweetPail, newPail, fs); // uses Map Reduce
+//        DataStore.readTweet(path);
+//        System.out.println("New path: ");
+//        DataStore.readTweet(newpath);
+//    }
+////      ---------- End Pail Test ---------------
+
         boolean drop = true;
 
         //cassandra cluster init
@@ -56,8 +80,8 @@ public class Main {
 
         // configure and set file to store(batch) new fastlayer's tweets
         FileSystem fs = DataStore.configureHDFS();
-        String filePath = "/user/ettore/tweet/batchTweet/tweet.txt";
-        DataStore.deleteFromHdfs(fs, filePath);
+        String filePath = "tweet/batchTweet/tweet.txt";
+        fs.delete(new Path("/user/ettore/pail/tweet"), true);
 
         // storm init
         TopologyBuilder builder = new TopologyBuilder();
@@ -73,18 +97,17 @@ public class Main {
         cluster.submitTopology("tweetp", conf, builder.createTopology());
 
         // put tweets processing in batchtable
-        LAexec la = new LAexec(mq);
-        for (int i = 0; i < 4; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
-            la.executeLA(fs, spout);
+        String batchpath = "hdfs://localhost:9000/user/ettore/pail/tweet/data";
+        LAexec la = new LAexec(mq, batchpath);
+        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
+            la.executeLA(fs);
             sleep(15000); //almost 4 tweets
         }
 
         cluster.shutdown();
         System.out.println("\nNew tweets stored in dfs:");
-        List filecontent = DataStore.readFromHdfs(fs, filePath);
-        for (Object o : filecontent)
-            System.out.println(o);
-        System.out.println("Number of tweets: " + filecontent.size());
+        List tweets = DataStore.readTweet(batchpath);
+        System.out.println("Number of tweets: " + tweets.size());
 
         ServingLayer servingLayer = new ServingLayer(dbF);
         String[] keywords = {"google", "apple", "microsoft"};
@@ -98,3 +121,4 @@ public class Main {
         System.out.println("------------------");
     }
 }
+
