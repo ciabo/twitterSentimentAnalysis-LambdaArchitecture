@@ -75,7 +75,7 @@ public class Main {
         cluster.submitTopology("tweetp", conf, builder.createTopology());
 
         // put tweets processing in batchtable
-        String batchpath = "hdfs://localhost:9000/user/ettore/pail/tweet/data";
+        String batchpath = "hdfs://localhost:9000/user/ettore/pail/tweet/batchTweet";
         LAexec la = new LAexec(mq, batchpath);
         for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
             la.executeLA(fs);

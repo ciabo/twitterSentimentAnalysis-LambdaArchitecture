@@ -9,6 +9,7 @@ import backtype.storm.tuple.Values;
 import com.backtype.hadoop.pail.Pail;
 import com.backtype.support.Utils;
 import masterdataset.DataStore;
+import masterdataset.Tweet;
 import masterdataset.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 
@@ -24,15 +25,14 @@ public class TweetSpout extends BaseRichSpout {
     private List<String> records;
     private int dbcounter;
     private FileSystem fs;
-    private static int numFile = 1;
     private String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
-    Pail newTweetPail;
+    private Pail<Tweet> newTweetPail;
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
         this.fs = DataStore.configureHDFS();
         try {
-            newTweetPail = new Pail(newpath);
+            newTweetPail = new Pail<Tweet>(newpath);
         } catch (IOException e) {
             System.out.println("--------------New Pail not created---------------");
         }
@@ -70,7 +70,7 @@ public class TweetSpout extends BaseRichSpout {
                 System.out.println(fulltweet.get(0) + " " + fulltweet.get(1) + " " + fulltweet.get(2) + " ");
                 DataStore.writeTweet(newTweetPail, fulltweet.get(0), fulltweet.get(1), fulltweet.get(2));
             } catch (IOException e) {
-                System.out.println("Error while appending newTweet" + numFile);
+                System.out.println("Error while appending newTweet");
             }
             collector.emit(new Values(line));
         }
