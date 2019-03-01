@@ -67,9 +67,13 @@ public class Main {
         // put tweets processing in batchtable
         String batchpath = "hdfs://localhost:9000/user/ettore/pail/tweet/batchTweet";
         LAexec la = new LAexec(mq, batchpath);
-        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
+        String[] keywords = {"google", "apple", "microsoft"};
+        Thread t = new Thread(new ServingLayer(keywords));
+        int k=0; //da fare: mettere un bel controllo sulla dimensione del file
+        while(k<10000){
             la.executeLA(fs);
             sleep(15000); //almost 4 tweets
+            k++;
         }
 
         cluster.shutdown();
@@ -77,15 +81,9 @@ public class Main {
         List tweets = DataStore.readTweet(batchpath);
         System.out.println("Number of tweets: " + tweets.size());
 
-        String[] keywords = {"google", "apple", "microsoft"};
 
-        Map<String, Long> results = ServingLayer.getResults(keywords);
-        Map<String, Long> treeMap = new TreeMap<String, Long>(results); // sort by key
-        System.out.println("QUERY RESULTS");
-        System.out.println("------------------");
-        for (String key : treeMap.keySet())
-            System.out.println(key + " | " + treeMap.get(key));
-        System.out.println("------------------");
+
+
     }
 }
 

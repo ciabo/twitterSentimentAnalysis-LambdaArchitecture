@@ -1,11 +1,21 @@
 import fastlayer.cassandra.SentimentRepository;
+import org.apache.tools.ant.taskdefs.Sleep;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.lang.Thread;
 
-public class ServingLayer {
+import static java.lang.Thread.sleep;
 
-    static public Map<String, Long> getResults(String[] keywords) {
+public class ServingLayer implements Runnable {
+
+    private String[] keywords;
+
+    public ServingLayer(String[] keywords){
+        this.keywords=keywords;
+    }
+    public void run() {
         SentimentRepository repository = SentimentRepository.getInstance();
         Map<String, Long> map = new HashMap<String, Long>();
         for (int i = 0; i < keywords.length; i++) {
@@ -27,6 +37,14 @@ public class ServingLayer {
                 map.put(keyword_sentiment, newVal);
             }
         }
-        return map;
+        Map<String, Long> treeMap = new TreeMap<String, Long>(map); // sort by key
+        System.out.println("QUERY RESULTS");
+        System.out.println("------------------");
+        for (String key : treeMap.keySet())
+            System.out.println(key + " | " + treeMap.get(key));
+        System.out.println("------------------");
+        try {
+            sleep(10000);
+        }catch (InterruptedException e){System.out.println("could not sleep the thread");}
     }
 }

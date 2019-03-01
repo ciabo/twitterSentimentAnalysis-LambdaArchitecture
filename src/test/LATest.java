@@ -101,22 +101,22 @@ public class LATest {
         assertEquals(14, tweets.size());
     }
 
-    @Test
-    public void testServingLayer() {
-        String[] keywords = {"google", "apple", "microsoft"};
-
-        Map<String, Long> results = ServingLayer.getResults(keywords);
-        Map<String, Long> treeMap = new TreeMap<String, Long>(results); // sort by key
-        System.out.println("QUERY RESULTS");
-        System.out.println("------------------");
-        for (String key : treeMap.keySet())
-            System.out.println(key + " | " + treeMap.get(key));
-        System.out.println("------------------");
-        for (String k : keywords) {
-            for (int s = -1; s <= 1; s++) {
-                count += db.selectCountFromKey("batchtable", k, s);
-            }
-        }
-        assertEquals(9, count);
-    }
+//    @Test
+//    public void testServingLayer() {
+//        String[] keywords = {"google", "apple", "microsoft"};
+//
+//        Map<String, Long> results = ServingLayer.getResults(keywords);
+//        Map<String, Long> treeMap = new TreeMap<String, Long>(results); // sort by key
+//        System.out.println("QUERY RESULTS");
+//        System.out.println("------------------");
+//        for (String key : treeMap.keySet())
+//            System.out.println(key + " | " + treeMap.get(key));
+//        System.out.println("------------------");
+//        for (String k : keywords) {
+//            for (int s = -1; s <= 1; s++) {
+//                count += db.selectCountFromKey("batchtable", k, s);
+//            }
+//        }
+//        assertEquals(9, count);
+//    }
 }

@@ -37,7 +37,7 @@ public class TweetSpout extends BaseRichSpout {
 
         this.collector = collector;
         this.dbcounter = 0;
-        String filename = "dbFast" + numFileforTest + ".txt";
+        String filename = "db" + numFileforTest + ".txt";
         this.records = new ArrayList<String>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -58,7 +58,7 @@ public class TweetSpout extends BaseRichSpout {
     }
 
     public void nextTuple() {
-        Utils.sleep(4000);
+        Utils.sleep(100);
         String line = records.get(dbcounter);
         if (dbcounter < records.size() - 1) {
             dbcounter++;
