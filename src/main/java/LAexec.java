@@ -81,7 +81,6 @@ public class LAexec {
 
     public void recomputeBatch(SentimentRepository repository, FileSystem fs) throws IOException {
         repository.deleteTable("batchtable");
-        mq.setandCreateSentimentRepo(repository, "batchtable");
         List tweets = DataStore.readTweet("pail/tweet/batchTweet");
         mq.tweetProcessing(tweets);
     }

@@ -6,9 +6,28 @@ import com.datastax.driver.core.Session;
 
 public class SentimentRepository {
     private Session session;
+    private static SentimentRepository instance = null;
 
-    public SentimentRepository(Session session) {
+    private SentimentRepository(Session session) {
         this.session = session;
+    }
+
+    public static SentimentRepository getInstance(Session session){
+        if(instance == null){
+            instance = new SentimentRepository(session);
+        }
+        return instance;
+    }
+
+    public static SentimentRepository getInstance(){
+        return instance;
+    }
+
+    public static boolean isSet(){
+        if(instance==null){
+            return false;
+        }
+        return true;
     }
 
     public void createTable(String tablename) {

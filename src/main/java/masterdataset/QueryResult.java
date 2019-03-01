@@ -12,7 +12,7 @@ public class QueryResult extends CascalogFunction {
         String keyword = functionCall.getArguments().getString(0);
         int sentiment = functionCall.getArguments().getInteger(1);
         int count = functionCall.getArguments().getInteger(2);
-        SentimentRepository smr = MDatasetQuery.smr;
+        SentimentRepository smr = SentimentRepository.getInstance();
         smr.addToCount("batchtable", keyword, sentiment, count);
         functionCall.getOutputCollector().add(new Tuple(keyword, sentiment, count));
     }

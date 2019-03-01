@@ -41,19 +41,15 @@ public class Main {
         KeyspaceRepository schemaRepository = new KeyspaceRepository(session);
         schemaRepository.useKeyspace(keyspaceName);
         // create fastlayer table
-        SentimentRepository dbF = new SentimentRepository(session);
+        SentimentRepository db = SentimentRepository.getInstance(session);
 
-        // create batchlayer table
-        MDatasetQuery mq = new MDatasetQuery();
-        SentimentRepository dbB = new SentimentRepository(session);
-        mq.setandCreateSentimentRepo(dbB, "batchtable");
 
         // drop table
         if (drop) {
-            dbF.deleteTable("fasttable");
-            dbB.deleteTable("bathctable");
-            dbF.createTable("fasttable");
-            dbF.createTable("batchtable");
+            db.deleteTable("fasttable");
+            db.deleteTable("bathctable");
+            db.createTable("fasttable");
+            db.createTable("batchtable");
         }
 
         // configure and set file to store(batch) new fastlayer's tweets
@@ -74,6 +70,7 @@ public class Main {
         // storm execution
         cluster.submitTopology("tweetp", conf, builder.createTopology());
 
+        MDatasetQuery mq = new MDatasetQuery();
         // put tweets processing in batchtable
         String batchpath = "hdfs://localhost:9000/user/ettore/pail/tweet/batchTweet";
         LAexec la = new LAexec(mq, batchpath);
@@ -87,10 +84,10 @@ public class Main {
         List tweets = DataStore.readTweet(batchpath);
         System.out.println("Number of tweets: " + tweets.size());
 
-        ServingLayer servingLayer = new ServingLayer(dbF);
+
         String[] keywords = {"google", "apple", "microsoft"};
 
-        Map<String, Integer> results = servingLayer.getResults(keywords);
+        Map<String, Integer> results = ServingLayer.getResults(keywords);
         Map<String, Integer> treeMap = new TreeMap<String, Integer>(results); // sort by key
         System.out.println("QUERY RESULTS");
         System.out.println("------------------");

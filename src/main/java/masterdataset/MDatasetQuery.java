@@ -9,12 +9,6 @@ import jcascalog.op.Count;
 import java.util.List;
 
 public class MDatasetQuery {
-    static SentimentRepository smr;
-
-    public void setandCreateSentimentRepo(SentimentRepository smr, String tablename) {
-        MDatasetQuery.smr = smr;
-        MDatasetQuery.smr.createTable(tablename);
-    }
 
     public void tweetProcessing(List tweet) {
         Api.execute(

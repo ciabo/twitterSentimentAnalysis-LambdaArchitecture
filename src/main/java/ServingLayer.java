@@ -7,13 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ServingLayer {
-    SentimentRepository repository;
 
-    public ServingLayer(SentimentRepository repository) {
-        this.repository = repository;
-    }
-
-    public Map<String, Integer> getResults(String[] keywords) {
+    static public Map<String, Integer> getResults(String[] keywords) {
+        SentimentRepository repository = SentimentRepository.getInstance();
         Map<String, Integer> map = new HashMap<String, Integer>();
         for (int i = 0; i < keywords.length; i++) {
             for (int j = -1; j <= 1; j++) {
