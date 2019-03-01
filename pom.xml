@@ -8,6 +8,14 @@
     <artifactId>twitterSentimentAnalysis</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+        <testSourceDirectory>src/test</testSourceDirectory>
+    </build>
     <repositories>
         <repository>
             <id>clojars.org</id>
