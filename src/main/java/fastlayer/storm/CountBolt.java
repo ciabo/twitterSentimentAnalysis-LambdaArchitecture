@@ -5,10 +5,6 @@ import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
-import fastlayer.cassandra.CassandraConnector;
-import fastlayer.cassandra.KeyspaceRepository;
 import fastlayer.cassandra.SentimentRepository;
 
 import java.util.Map;

@@ -8,6 +8,8 @@ import org.apache.hadoop.fs.Path;
 import org.junit.*;
 import utils.Utils;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class PailTest {
 
     @Test
     public void testBatchPail() throws IOException {
-        DataStore.writeTweet(tweetPail, "1502019", "192133", "Team Giannis");
+        DataStore.writeTweet(tweetPail, "15022019", "192133", "Team Giannis");
         DataStore.writeTweet(tweetPail, "01032019", "121133", "Team Ettore");
         DataStore.readTweet(path);
     }

@@ -10,7 +10,6 @@ import com.backtype.hadoop.pail.Pail;
 import com.backtype.support.Utils;
 import masterdataset.DataStore;
 import masterdataset.Tweet;
-import masterdataset.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 
 import java.io.BufferedReader;
@@ -68,15 +67,12 @@ public class TweetSpout extends BaseRichSpout {
                 System.out.println("Writing on newTweet");
                 List<String> fulltweet = utils.Utils.generateTweet(line);
                 System.out.println(fulltweet.get(0) + " " + fulltweet.get(1) + " " + fulltweet.get(2) + " ");
-                DataStore.writeTweet(newTweetPail, fulltweet.get(0), fulltweet.get(1), fulltweet.get(2));
+//                DataStore.writeTweet(newTweetPail, fulltweet.get(0), fulltweet.get(1), fulltweet.get(2));
+                DataStore.writeTweet(newTweetPail, "03032019","165722","Ciao dallo spout");
             } catch (IOException e) {
                 System.out.println("Error while appending newTweet");
             }
             collector.emit(new Values(line));
         }
-    }
-
-    public Pail getPail() {
-        return this.newTweetPail;
     }
 }
