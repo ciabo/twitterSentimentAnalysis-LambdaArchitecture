@@ -31,12 +31,12 @@ public class TweetStructure implements PailStructure<Tweet> {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(serialized);
         DataInputStream dataIn = new DataInputStream(byteIn);
         try {
-            byte[] tweet = new byte[dataIn.readInt()];
-            dataIn.read(tweet);
             byte[] date = new byte[dataIn.readInt()];
             dataIn.read(date);
             byte[] timeStamp = new byte[dataIn.readInt()];
             dataIn.read(timeStamp);
+            byte[] tweet = new byte[dataIn.readInt()];
+            dataIn.read(tweet);
             return new Tweet(new String(date), new String(timeStamp), new String(tweet));
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -68,7 +68,7 @@ public class DataStore {
         Pail<Tweet> tweetPail = new Pail<Tweet>(path);
         List tweets = new ArrayList();
         for (Tweet t : tweetPail) {
-            System.out.println("Tweet: " + t.getTweet() + " Date: " + t.getDate() + " Time: " + t.getTimestamp());
+            System.out.println("Date: " + t.getDate() + " Time Stamp: " + t.getTimestamp() + " Tweet: " + t.getTweet());
             tweets = Arrays.asList(Arrays.asList(t.getDate() + "," + t.getTimestamp() + "," + t.getTweet()));
         }
         return tweets;
