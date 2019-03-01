@@ -16,7 +16,6 @@ public class SentimentAnalysis extends CascalogFunction {
 
     @Override
     public void operate(FlowProcess process, FunctionCall call) {
-        //System.out.println("I'm searching for: " + keywords);
         String tweet = call.getArguments().getString(0);
         NLP.init();
         int sentiment = NLP.findSentiment(tweet);

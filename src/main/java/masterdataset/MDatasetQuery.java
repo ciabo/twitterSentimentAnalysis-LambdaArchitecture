@@ -1,7 +1,6 @@
 package masterdataset;
 
 import com.twitter.maple.tap.StdoutTap;
-import fastlayer.cassandra.SentimentRepository;
 import jcascalog.Api;
 import jcascalog.Subquery;
 import jcascalog.op.Count;

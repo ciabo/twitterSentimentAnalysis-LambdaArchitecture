@@ -10,7 +10,6 @@ import com.backtype.hadoop.pail.Pail;
 import com.backtype.support.Utils;
 import masterdataset.DataStore;
 import masterdataset.Tweet;
-import org.apache.hadoop.fs.FileSystem;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -23,13 +22,13 @@ public class TweetSpout extends BaseRichSpout {
     private SpoutOutputCollector collector;
     private List<String> records;
     private int dbcounter;
-    private FileSystem fs;
-    private String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
+    private String newpath = "hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData";
     private Pail<Tweet> newTweetPail;
+    private static String test = "";
+    private static String numFileforTest = "";
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
-        this.fs = DataStore.configureHDFS();
         try {
             newTweetPail = new Pail<Tweet>(newpath);
         } catch (IOException e) {
@@ -38,7 +37,7 @@ public class TweetSpout extends BaseRichSpout {
 
         this.collector = collector;
         this.dbcounter = 0;
-        String filename = "dbFast15.txt";
+        String filename = "dbFast" + numFileforTest + ".txt";
         this.records = new ArrayList<String>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -71,6 +70,14 @@ public class TweetSpout extends BaseRichSpout {
                 System.out.println("Error while appending newTweet");
             }
             collector.emit(new Values(line));
+        }
+    }
+
+    // Method for testing
+    public static void setTest(String test, String check) {
+        if (check.equals("test")) {
+            TweetSpout.numFileforTest = test;
+            TweetSpout.test = "test";
         }
     }
 }

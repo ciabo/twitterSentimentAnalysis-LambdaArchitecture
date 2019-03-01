@@ -1,6 +1,5 @@
 import com.backtype.hadoop.pail.Pail;
 import fastlayer.cassandra.SentimentRepository;
-import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
 import masterdataset.TweetStructure;
@@ -18,12 +17,15 @@ public class LAexec {
     private MDatasetQuery mq;
     private Pail tweetPail;
     private Pail newTweetPail;
-    private String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
+    private static String test = "";
+    private String newpath = "hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData";
+    private String batchPath;
 
     public LAexec(MDatasetQuery mq, String batchTweet) {
         this.mq = mq;
+        this.batchPath = batchTweet;
         try {
-            tweetPail = Pail.create(batchTweet, new TweetStructure());
+            tweetPail = Pail.create(batchPath, new TweetStructure());
             newTweetPail = Pail.create(newpath, new TweetStructure());
         } catch (IOException e) {
             System.out.println("Unable to create bact tweet Pail");
@@ -64,8 +66,16 @@ public class LAexec {
         return fast;
     }
 
+    public static void setTest(String test) {
+        LAexec.test = test;
+    }
+
     public void executeLA(FileSystem fs) throws IOException {
-        DataStore.ingestPail(tweetPail, newTweetPail, fs, "");
+        List tweets = new ArrayList();
+        if (DataStore.readTweet("hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData").size() != 0) {
+            tweets = DataStore.ingestPail(tweetPail, newTweetPail, fs, test);
+            mq.tweetProcessing(tweets);
+        }
     }
 
     public void recomputeBatch(SentimentRepository repository, FileSystem fs) throws IOException {
