@@ -14,7 +14,7 @@ public class QueryResult extends CascalogFunction {
         int count = functionCall.getArguments().getInteger(2);
         SentimentRepository smr = SentimentRepository.getInstance();
         smr.addToCount("batchtable", keyword, sentiment, count);
-        smr.substractToCount("batchtable",keyword,sentiment,count);
+        smr.substractToCount("fasttable",keyword,sentiment,count);
         functionCall.getOutputCollector().add(new Tuple(keyword, sentiment, count));
     }
 }
