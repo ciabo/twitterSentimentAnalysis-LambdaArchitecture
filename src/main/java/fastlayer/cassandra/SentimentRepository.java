@@ -41,7 +41,7 @@ public class SentimentRepository {
         session.execute(query);
     }
 
-    public int selectCountFromKey(String tablename,String keyword, int sentiment) {
+    public long selectCountFromKey(String tablename,String keyword, int sentiment) {
         StringBuilder sb = new StringBuilder("SELECT count FROM ")
                 .append(tablename)
                 .append(" WHERE keyword = '")
@@ -55,7 +55,7 @@ public class SentimentRepository {
         if(r==null)
              return 0;
         else
-            return r.getInt("count");
+            return r.getLong("count");
     }
 
     public void updateCount(String tablename, String keyword, int sentiment, int newCount) {

@@ -72,7 +72,7 @@ public class Main {
         // put tweets processing in batchtable
         String batchpath = "hdfs://localhost:9000/user/ettore/pail/tweet/batchTweet";
         LAexec la = new LAexec(mq, batchpath);
-        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
+        for (int i = 0; i < 7; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
             la.executeLA(fs);
             sleep(15000); //almost 4 tweets
         }
@@ -84,8 +84,8 @@ public class Main {
 
         String[] keywords = {"google", "apple", "microsoft"};
 
-        Map<String, Integer> results = ServingLayer.getResults(keywords);
-        Map<String, Integer> treeMap = new TreeMap<String, Integer>(results); // sort by key
+        Map<String, Long> results = ServingLayer.getResults(keywords);
+        Map<String, Long> treeMap = new TreeMap<String, Long>(results); // sort by key
         System.out.println("QUERY RESULTS");
         System.out.println("------------------");
         for (String key : treeMap.keySet())
