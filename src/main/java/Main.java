@@ -28,28 +28,6 @@ import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException, URISyntaxException {
-////      ----------Pail Test-----------
-
-//        FileSystem fs = DataStore.configureHDFS();
-//        fs.delete(new Path("/user/ettore/pail/tweet"), true);
-//
-//        String path = "hdfs://localhost:9000/user/ettore/pail/tweet/data";
-//        Pail tweetPail = Pail.create(path, new TweetStructure());
-//        DataStore.writeTweet(tweetPail, "1502019", "192133", "Team Giannis");
-//        DataStore.readTweet(path);
-//
-//        String newpath = "hdfs://localhost:9000/user/ettore/pail/tweet/newData";
-//        Pail newPail = Pail.create(newpath, new TweetStructure());
-//        DataStore.writeTweet(newPail, "13022019", "155849", "This isn't good");
-//        DataStore.readTweet(newpath);
-//
-//        System.out.println("Data folder: ");
-//        DataStore.ingestPail(tweetPail, newPail, fs); // uses Map Reduce
-//        DataStore.readTweet(path);
-//        System.out.println("New path: ");
-//        DataStore.readTweet(newpath);
-//    }
-////      ---------- End Pail Test ---------------
 
         boolean drop = true;
 
