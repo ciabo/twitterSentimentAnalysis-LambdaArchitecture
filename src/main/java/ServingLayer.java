@@ -1,10 +1,9 @@
 import fastlayer.cassandra.SentimentRepository;
-import org.apache.tools.ant.taskdefs.Sleep;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.lang.Thread;
+
 
 import static java.lang.Thread.sleep;
 
@@ -15,6 +14,7 @@ public class ServingLayer implements Runnable {
         this.keywords = keywords;
     }
 
+    @Override
     public void run() {
         SentimentRepository repository = SentimentRepository.getInstance();
         Map<String, Long> map = new HashMap<String, Long>();
