@@ -59,6 +59,7 @@ public class Main {
         LocalCluster cluster = new LocalCluster();
         Config conf = new Config();
         conf.setDebug(true);
+        conf.put(Config.TOPOLOGY_DEBUG, false);
 
         // storm execution
         cluster.submitTopology("tweetp", conf, builder.createTopology());
@@ -69,7 +70,9 @@ public class Main {
         LAexec la = new LAexec(mq, batchpath);
         String[] keywords = {"google", "apple", "microsoft"};
         Thread t = new Thread(new ServingLayer(keywords));
+        t.start();
         int k=0; //da fare: mettere un bel controllo sulla dimensione del file
+        //certe volte dà errore quasi subito dicendo che non esiste un pail
         while(k<10000){
             la.executeLA(fs);
             sleep(15000); //almost 4 tweets
