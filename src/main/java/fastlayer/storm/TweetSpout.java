@@ -24,10 +24,11 @@ public class TweetSpout extends BaseRichSpout {
     private SpoutOutputCollector collector;
     private List<String> records;
     private int dbcounter;
+    private static String test = "";
     private String newpath = "hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData";
     private Pail<Tweet> newTweetPail;
-    private static String test = "";
-    private static String numFileforTest = "";
+    private static String numFileforTest = "15";
+    private static int rand = 200;
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
@@ -61,7 +62,7 @@ public class TweetSpout extends BaseRichSpout {
 
     public void nextTuple() {
         Random random = new Random();
-        int millis = random.nextInt(200)+100;
+        int millis = random.nextInt(rand) + 100;
         Utils.sleep(millis);
         String line = records.get(dbcounter);
         if (dbcounter < records.size() - 1) {
@@ -81,6 +82,14 @@ public class TweetSpout extends BaseRichSpout {
     public static void setTest(String test, String check) {
         if (check.equals("test")) {
             TweetSpout.numFileforTest = test;
+            TweetSpout.test = "test";
+        }
+    }
+
+    // Method for testing
+    public static void setRand(int rand, String check) {
+        if (check.equals("test")) {
+            TweetSpout.rand = rand;
             TweetSpout.test = "test";
         }
     }

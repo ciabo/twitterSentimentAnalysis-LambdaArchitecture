@@ -2,6 +2,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import com.backtype.hadoop.pail.Pail;
 import com.datastax.driver.core.Session;
 import fastlayer.cassandra.CassandraConnector;
 import fastlayer.cassandra.KeyspaceRepository;
@@ -11,6 +12,7 @@ import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
+import masterdataset.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.AfterClass;
@@ -21,8 +23,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static java.lang.Thread.sleep;
 
@@ -30,14 +30,17 @@ public class LATest {
     private static SentimentRepository db;
     private static FileSystem fs;
     private static LocalCluster cluster;
-    private static String batchpath = "hdfs://localhost:9000/user/ettore/testpail/tweet/batchTweet";
     private static LAexec la;
     private long count;
+    private static String newpath = "hdfs://localhost:9000/user/ettore/testpail/tweet/newData";
+    private static String batchPath = "hdfs://localhost:9000/user/ettore/testpail/tweet/batchTweet";
 
     @BeforeClass
     public static void setUp() throws IOException {
         TweetSpout.setTest("15", "test");
+        TweetSpout.setRand(5000, "test");
         LAexec.setTest("test");
+
 
         //cassandra cluster init
         CassandraConnector client = new CassandraConnector();
@@ -64,7 +67,7 @@ public class LATest {
         MDatasetQuery mq = new MDatasetQuery();
 
         // init Lambda Architecture
-        la = new LAexec(mq, batchpath);
+        la = new LAexec(mq);
 
         // storm init
         TopologyBuilder builder = new TopologyBuilder();
@@ -85,38 +88,51 @@ public class LATest {
         db.deleteTable("fasttable");
         db.deleteTable("batchtable");
         fs.delete(new Path("/user/ettore/testpail"), true);
+        cluster.shutdown();
     }
 
     @Test
     public void testPingPong() throws IOException, InterruptedException {
         // put tweets processing in batchtable
-        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
+        for (int i = 0; i < 4; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
             la.executeLA(fs);
             sleep(15000); //almost 4 tweets
         }
 
-        cluster.shutdown();
         System.out.println("\nNew tweets stored in dfs:");
-        List tweets = DataStore.readTweet(batchpath);
+        List<List<String>> tweets = DataStore.readTweet(batchPath);
+        for (List<String> l : tweets)
+            for (String s : l)
+                System.out.println(s);
+        System.out.println("Number of tweets: " + tweets.size());
         assertEquals(14, tweets.size());
     }
 
-//    @Test
-//    public void testServingLayer() {
-//        String[] keywords = {"google", "apple", "microsoft"};
-//
-//        Map<String, Long> results = ServingLayer.getResults(keywords);
-//        Map<String, Long> treeMap = new TreeMap<String, Long>(results); // sort by key
-//        System.out.println("QUERY RESULTS");
-//        System.out.println("------------------");
-//        for (String key : treeMap.keySet())
-//            System.out.println(key + " | " + treeMap.get(key));
-//        System.out.println("------------------");
-//        for (String k : keywords) {
-//            for (int s = -1; s <= 1; s++) {
-//                count += db.selectCountFromKey("batchtable", k, s);
-//            }
-//        }
-//        assertEquals(9, count);
-//    }
+    @Test
+    public void testServingLayer() {
+        String[] keywords = {"google", "apple", "microsoft"};
+        Thread t = new Thread(new ServingLayer(keywords));
+        t.start();
+        for (String k : keywords) {
+            for (int s = -1; s <= 1; s++) {
+                count += db.selectCountFromKey("batchtable", k, s);
+            }
+        }
+        assertEquals(9, count);
+    }
+
+    @Test
+    public void testRecomputeBatch() throws IOException {
+        la.recomputeBatch(db);
+        db.createTable("batchtable");
+        String[] keywords = {"google", "apple", "microsoft"};
+        Thread t = new Thread(new ServingLayer(keywords));
+        t.start();
+        for (String k : keywords) {
+            for (int s = -1; s <= 1; s++) {
+                count += db.selectCountFromKey("batchtable", k, s);
+            }
+        }
+        assertEquals(9, count);
+    }
 }

@@ -51,6 +51,14 @@ public class DataStore {
         }
     }
 
+    private static List readPail(Pail<Tweet> p) {
+        List tweets = new ArrayList();
+        for (Tweet t : p) {
+            tweets.add(Arrays.asList(t.getDate() + "," + t.getTimestamp() + "," + t.getTweet()));
+        }
+        return tweets;
+    }
+
     public static void writeTweet(final Pail<Tweet> tweetPail, final String date, final String timestamp, final String tweet) throws IOException {
         Pail.TypedRecordOutputStream out = tweetPail.openWrite();
         out.writeObject(new Tweet(date, timestamp, tweet));
@@ -59,12 +67,7 @@ public class DataStore {
 
     public static List readTweet(String path) throws IOException {
         Pail<Tweet> tweetPail = new Pail<Tweet>(path);
-        List tweets = new ArrayList();
-        for (Tweet t : tweetPail) {
-            System.out.println("Date: " + t.getDate() + " Time Stamp: " + t.getTimestamp() + " Tweet: " + t.getTweet());
-            tweets.add(Arrays.asList(t.getDate() + "," + t.getTimestamp() + "," + t.getTweet()));
-        }
-        return tweets;
+        return readPail(tweetPail);
     }
 
     private static void appendTweet(Pail src, Pail dst) throws IOException {
@@ -77,10 +80,7 @@ public class DataStore {
         fs.mkdirs(new Path("/user/ettore/" + test + "pail/tweet/swa"));
 
         Pail<Tweet> snapShot = newPail.snapshot("hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/swa/newData");
-        List tweets = new ArrayList();
-        for (Tweet t : snapShot) {
-            tweets.add(Arrays.asList(t.getDate() + "," + t.getTimestamp() + "," + t.getTweet()));
-        }
+        List tweets = readPail(snapShot);
         appendTweet(newPail, tweetPail);
         newPail.deleteSnapshot(snapShot);
         return tweets;

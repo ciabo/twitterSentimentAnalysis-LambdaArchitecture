@@ -2,6 +2,7 @@ import com.backtype.hadoop.pail.Pail;
 import fastlayer.cassandra.SentimentRepository;
 import masterdataset.DataStore;
 import masterdataset.MDatasetQuery;
+import masterdataset.Tweet;
 import masterdataset.TweetStructure;
 import utils.Utils;
 import org.apache.hadoop.fs.FileSystem;
@@ -19,16 +20,19 @@ public class LAexec {
     private Pail newTweetPail;
     private static String test = "";
     private String newpath = "hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData";
-    private String batchPath;
+    private String batchPath = "hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/batchTweet";
 
-    public LAexec(MDatasetQuery mq, String batchTweet) {
+    public LAexec(MDatasetQuery mq) {
         this.mq = mq;
-        this.batchPath = batchTweet;
         try {
-            tweetPail = Pail.create(batchPath, new TweetStructure());
-            newTweetPail = Pail.create(newpath, new TweetStructure());
+            if(test.equals("test")) {
+                this.newTweetPail = Pail.create(newpath, new TweetStructure());
+                this.tweetPail = Pail.create(batchPath, new TweetStructure());
+            }else {
+                newTweetPail = new Pail(newpath);
+                tweetPail = new Pail(batchPath);
+            }
         } catch (IOException e) {
-            System.out.println("Unable to create bact tweet Pail");
         }
     }
 
@@ -36,7 +40,7 @@ public class LAexec {
         try {
             BufferedReader br = new BufferedReader(new FileReader(filename));
 //            BufferedWriter bwB = new BufferedWriter(new FileWriter("dbBatch.txt"));
-//            BufferedWriter bwF = new BufferedWriter(new FileWriter("dbFast15.txt"));
+//            BufferedWriter bwF = new BufferedWriter(new FileWriter("db15.txt"));
             String line;
             int count = 0;
             while ((line = br.readLine()) != null && count < 15) {
@@ -66,21 +70,21 @@ public class LAexec {
         return fast;
     }
 
-    public static void setTest(String test) {
-        LAexec.test = test;
-    }
-
     public void executeLA(FileSystem fs) throws IOException {
-        List tweets = new ArrayList();
+        List tweets;
         if (DataStore.readTweet("hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData").size() != 0) {
             tweets = DataStore.ingestPail(tweetPail, newTweetPail, fs, test);
             mq.tweetProcessing(tweets);
         }
     }
 
-    public void recomputeBatch(SentimentRepository repository, FileSystem fs) throws IOException {
+    public void recomputeBatch(SentimentRepository repository) throws IOException {
         repository.deleteTable("batchtable");
-        List tweets = DataStore.readTweet("pail/tweet/batchTweet");
+        List tweets = DataStore.readTweet("hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/batchTweet");
         mq.tweetProcessing(tweets);
+    }
+
+    public static void setTest(String test) {
+        LAexec.test = test;
     }
 }
