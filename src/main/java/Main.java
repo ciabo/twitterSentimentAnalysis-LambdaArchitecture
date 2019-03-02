@@ -39,6 +39,7 @@ public class Main {
         List<List<String>> tweets = DataStore.readTweet(init.getBatchPath());
         Utils.printLisofList(tweets);
         System.out.println("Number of tweets: " + tweets.size());
+
     }
 }
 

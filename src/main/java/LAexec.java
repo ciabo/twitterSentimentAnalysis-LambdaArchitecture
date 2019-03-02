@@ -25,10 +25,10 @@ public class LAexec {
     public LAexec(MDatasetQuery mq) {
         this.mq = mq;
         try {
-            if(test.equals("test")) {
+            if (test.equals("test")) {
                 this.newTweetPail = Pail.create(newpath, new TweetStructure());
                 this.tweetPail = Pail.create(batchPath, new TweetStructure());
-            }else {
+            } else {
                 newTweetPail = new Pail(newpath);
                 tweetPail = new Pail(batchPath);
             }
@@ -80,6 +80,7 @@ public class LAexec {
 
     public void recomputeBatch(SentimentRepository repository) throws IOException {
         repository.deleteTable("batchtable");
+        repository.createTable("batchtable");
         List tweets = DataStore.readTweet("hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/batchTweet");
         mq.tweetProcessing(tweets);
     }
