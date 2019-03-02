@@ -41,7 +41,6 @@ public class LATest {
         TweetSpout.setRand(5000, "test");
         LAexec.setTest("test");
 
-
         //cassandra cluster init
         CassandraConnector client = new CassandraConnector();
         client.connect("127.0.0.1", null);
@@ -109,10 +108,12 @@ public class LATest {
     }
 
     @Test
-    public void testServingLayer() {
+    public void testServingLayer() throws InterruptedException {
         String[] keywords = {"google", "apple", "microsoft"};
         Thread t = new Thread(new ServingLayer(keywords));
         t.start();
+        sleep(1000);
+        t.interrupt();
         for (String k : keywords) {
             for (int s = -1; s <= 1; s++) {
                 count += db.selectCountFromKey("batchtable", k, s);
@@ -126,8 +127,6 @@ public class LATest {
         la.recomputeBatch(db);
         db.createTable("batchtable");
         String[] keywords = {"google", "apple", "microsoft"};
-        Thread t = new Thread(new ServingLayer(keywords));
-        t.start();
         for (String k : keywords) {
             for (int s = -1; s <= 1; s++) {
                 count += db.selectCountFromKey("batchtable", k, s);
