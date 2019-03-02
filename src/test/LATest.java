@@ -54,6 +54,9 @@ public class LATest {
         // create fastlayer table
         db = SentimentRepository.getInstance(session);
 
+        // drop table
+        db.deleteTable("fasttable");
+        db.deleteTable("batchtable");
         // create table
         db.createTable("fasttable");
         db.createTable("batchtable");
@@ -112,6 +115,8 @@ public class LATest {
         String[] keywords = {"google", "apple", "microsoft"};
         Thread t = new Thread(new ServingLayer(keywords));
         t.start();
+        sleep(500);
+        t.interrupt();
         for (String k : keywords) {
             for (int s = -1; s <= 1; s++) {
                 count += db.selectCountFromKey("batchtable", k, s);

@@ -27,7 +27,7 @@ public class TweetSpout extends BaseRichSpout {
     private static String test = "";
     private String newpath = "hdfs://localhost:9000/user/ettore/" + test + "pail/tweet/newData";
     private Pail<Tweet> newTweetPail;
-    private static String numFileforTest = "15";
+    private static String numFileforTest = "15Plot";
     private static int rand = 200;
 
     //open is called during initialization by storm and the SpoutOutputCollector is where the output will be sent
