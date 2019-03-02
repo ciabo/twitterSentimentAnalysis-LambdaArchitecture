@@ -53,6 +53,8 @@ public class ServingLayer implements Runnable {
             }
             map.clear();
             treeMap.clear();
+
+
         }
     }
 }
