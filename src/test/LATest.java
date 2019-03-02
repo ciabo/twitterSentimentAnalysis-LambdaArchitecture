@@ -93,7 +93,7 @@ public class LATest {
     @Test
     public void testPingPong() throws IOException, InterruptedException {
         // put tweets processing in batchtable
-        for (int i = 0; i < 4; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
+        for (int i = 0; i < 5; i++) { // 15 tweets in total, each iteration consumes 4 tweets, 3/4 iterations are enough
             la.executeLA(fs);
             sleep(15000); //almost 4 tweets
         }
@@ -112,11 +112,10 @@ public class LATest {
         String[] keywords = {"google", "apple", "microsoft"};
         Thread t = new Thread(new ServingLayer(keywords));
         t.start();
-        sleep(1000);
-        t.interrupt();
         for (String k : keywords) {
             for (int s = -1; s <= 1; s++) {
                 count += db.selectCountFromKey("batchtable", k, s);
+                count += db.selectCountFromKey("fasttable", k, s);
             }
         }
         assertEquals(9, count);
@@ -125,7 +124,6 @@ public class LATest {
     @Test
     public void testRecomputeBatch() throws IOException {
         la.recomputeBatch(db);
-        db.createTable("batchtable");
         String[] keywords = {"google", "apple", "microsoft"};
         for (String k : keywords) {
             for (int s = -1; s <= 1; s++) {
