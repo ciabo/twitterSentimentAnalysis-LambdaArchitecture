@@ -55,5 +55,11 @@ public class Utils {
         List<String> fulltweet = Arrays.asList(split[0], split[1], tweet);
         return fulltweet;
     }
+
+    public static void printLisofList(List<List<String>> tweets) {
+        for (List<String> l : tweets)
+            for (String s : l)
+                System.out.println(s);
+    }
 }
 
