@@ -54,6 +54,9 @@ public class LATest {
         // create fastlayer table
         db = SentimentRepository.getInstance(session);
 
+        // drop table
+        db.deleteTable("fasttable");
+        db.deleteTable("batchtable");
         // create table
         db.createTable("fasttable");
         db.createTable("batchtable");
