@@ -19,7 +19,7 @@ public class DataStore {
         try {
             Configuration conf = new Configuration();
             conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
-            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false"); // TODO: 22/02/19 MAYBE in a cluster with multiple nodes must be true
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false");
             conf.setBoolean("dfs.support.append", true);
             fs = FileSystem.get(conf);
         } catch (IOException e) {
@@ -34,7 +34,7 @@ public class DataStore {
             Configuration conf = new Configuration();
             conf.set("fs.defaultFS", "hdfs://localhost:9000/user/ettore");
             conf.set("dfs.permissions.enabled", "false");
-            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false"); // TODO: 22/02/19 MAYBE in a cluster with multiple nodes must be true
+            conf.set("dfs.client.block.write.replace-datanode-on-failure.enable", "false");
             conf.setBoolean("dfs.support.append", true);
             dfsAdmin = new HdfsAdmin(new URI("hdfs://localhost:9000/user/ettore"), conf);
         } catch (IOException e) {

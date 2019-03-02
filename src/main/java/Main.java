@@ -1,7 +1,6 @@
 
 import backtype.storm.LocalCluster;
 import masterdataset.DataStore;
-import org.apache.hadoop.fs.Path;
 import utils.Utils;
 
 import java.io.*;
@@ -26,7 +25,7 @@ public class Main {
         String[] keywords = {"google", "apple", "microsoft"};
         Thread t = new Thread(new ServingLayer(keywords));
         t.start();
-        int k = 0; //da fare: mettere un bel controllo sulla dimensione del file
+        int k = 0; //Todo mettere un bel controllo sulla dimensione del file <-- non so a che serve.. usa countlines di Utils
         while (k < 10000) {
             la.executeLA(init.getFs());
             sleep(15000); //almost 4 tweets
@@ -39,7 +38,6 @@ public class Main {
         List<List<String>> tweets = DataStore.readTweet(init.getBatchPath());
         Utils.printLisofList(tweets);
         System.out.println("Number of tweets: " + tweets.size());
-
     }
 }
 
