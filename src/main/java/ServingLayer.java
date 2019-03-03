@@ -49,6 +49,7 @@ public class ServingLayer implements Runnable {
     @Override
     public void run() {
         try {
+            dc = new DrawChart("Sentiment trend", 0, 0, 0,0);
             while (true) {
                 for (int i = 0; i < keywords.length; i++) {
                     for (int j = -1; j <= 1; j++) {
@@ -84,7 +85,7 @@ public class ServingLayer implements Runnable {
                 // plot trend
                 List<Integer> trend = getCounts(map);
                 System.out.println("Apple: " + trend.get(0) + " Google: " + trend.get(1) + " Microsoft: " + trend.get(2));
-                dc = new DrawChart("Sentiment trend", trend.get(0), trend.get(1), trend.get(2), time += 10);
+                dc.update(trend.get(0), trend.get(1), trend.get(2), time += 10);
                 dc.setSize(800, 400);
                 dc.setLocationRelativeTo(null);
 //            dc.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -98,8 +99,6 @@ public class ServingLayer implements Runnable {
             //cleaning of maps
             map.clear();
             treeMap.clear();
-
-
         }
     }
 }
