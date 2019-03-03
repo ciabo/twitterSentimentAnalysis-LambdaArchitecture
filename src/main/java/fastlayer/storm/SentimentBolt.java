@@ -10,6 +10,7 @@ import backtype.storm.tuple.Values;
 import utils.NLP;
 import utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -26,17 +27,17 @@ public class SentimentBolt extends BaseBasicBolt {
         String line = tuple.getStringByField("line");
         String[] split = line.split(",");
         String tweet = Utils.createTweet(Arrays.copyOfRange(split, 2, split.length));
-        String[] keywords = {"apple", "google", "microsoft"};
+        final ArrayList<String> keywords = Utils.getKeywords();
         boolean keywordPresent = false;
         int i = 0;
-        while (keywordPresent == false && i < keywords.length) {
-            keywordPresent = tweet.toLowerCase().contains(keywords[i]);
+        while (keywordPresent == false && i < keywords.size()) {
+            keywordPresent = tweet.toLowerCase().contains(keywords.get(i));
             i++;
         }
         if (keywordPresent == true) {
             int sentiment = NLP.findSentiment(tweet);
             i--;
-            collector.emit(new Values(keywords[i], sentiment));
+            collector.emit(new Values(keywords.get(i), sentiment));
         }
     }
 }

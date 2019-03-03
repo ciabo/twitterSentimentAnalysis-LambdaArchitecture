@@ -5,11 +5,23 @@ import utils.Utils;
 
 import java.io.*;
 import java.util.List;
+import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
 
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
+
+        System.out.println("Insert keywords(stop to break): ");
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            String word = sc.next();
+            if (word.toLowerCase().equals("stop"))
+                break;
+            Utils.addKeyword(word.toLowerCase());
+        }
+
+        System.out.println(Utils.getKeywords());
 
         //Pail, Cassandra, Filesystem and Storm init
         Init init = new Init();

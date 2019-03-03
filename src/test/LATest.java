@@ -18,6 +18,7 @@ import org.apache.hadoop.fs.Path;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import utils.Utils;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,6 +41,9 @@ public class LATest {
         TweetSpout.setTest("15", "test");
         TweetSpout.setRand(5000, "test");
         LAexec.setTest("test");
+        Utils.addKeyword("apple");
+        Utils.addKeyword("google");
+        Utils.addKeyword("microsoft");
 
         //cassandra cluster init
         CassandraConnector client = new CassandraConnector();

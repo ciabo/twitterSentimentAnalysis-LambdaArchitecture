@@ -5,6 +5,7 @@ import cascading.operation.FunctionCall;
 import cascading.tuple.Tuple;
 import cascalog.CascalogFunction;
 import utils.NLP;
+import utils.Utils;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SentimentAnalysis extends CascalogFunction {
-    private static final List<String> keywords = Arrays.asList("apple", "google", "microsoft");
+    private final List<String> keywords = Utils.getKeywords();
 
     @Override
     public void operate(FlowProcess process, FunctionCall call) {

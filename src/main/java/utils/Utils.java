@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
+    private static final ArrayList<String> keywords = new ArrayList<String>();
+
     public static String createTweet(String[] array) {
         StringBuilder tweet = new StringBuilder();
         for (String str : array) {
@@ -60,6 +62,14 @@ public class Utils {
         for (List<String> l : tweets)
             for (String s : l)
                 System.out.println(s);
+    }
+
+    public static ArrayList<String> getKeywords() {
+        return keywords;
+    }
+
+    public static void addKeyword(String key) {
+        keywords.add(key);
     }
 }
 
