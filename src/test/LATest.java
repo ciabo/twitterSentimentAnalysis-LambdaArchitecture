@@ -124,6 +124,7 @@ public class LATest {
             }
         }
         assertEquals(9, count);
+        sleep(3000);
     }
 
     @Test

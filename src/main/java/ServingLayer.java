@@ -49,7 +49,7 @@ public class ServingLayer implements Runnable {
     @Override
     public void run() {
         try {
-            dc = new DrawChart("Sentiment trend", 0, 0, 0,0);
+            dc = new DrawChart("Sentiment trend", 0, 0, 0, 0);
             while (true) {
                 for (int i = 0; i < keywords.length; i++) {
                     for (int j = -1; j <= 1; j++) {
