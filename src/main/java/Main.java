@@ -34,8 +34,7 @@ public class Main {
         cluster.submitTopology("tweetp", init.getConf(), init.getBuilder().createTopology());
 
         // start ping pong
-        String[] keywords = {"google", "apple", "microsoft"};
-        Thread t = new Thread(new ServingLayer(keywords));
+        Thread t = new Thread(new ServingLayer());
         t.start();
         int k = 0; //Todo mettere un bel controllo sulla dimensione del file <-- non so a che serve.. usa countlines di Utils
         while (k < 10000) {

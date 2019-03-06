@@ -15,19 +15,19 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class DrawChart extends JFrame {
     private static final long serialVersionUID = 1L;
-    private int countApple;
-    private int countGoogle;
-    private int countMicrosoft;
+    private int count1;
+    private int count2;
+    private int count3;
     private int time;
     private List<Integer[]> history;
 
-    public DrawChart(String title, int countApple, int countGoogle, int countMicrosft, int time) {
+    public DrawChart(String title, int count1, int count2, int count3, int time) {
         super(title);
         this.time = time;
-        this.countApple = countApple;
-        this.countGoogle = countGoogle;
-        this.countMicrosoft = countMicrosft;
-        Integer[] values = {countApple, countGoogle, countMicrosft};
+        this.count1 = count1;
+        this.count2 = count2;
+        this.count3 = count3;
+        Integer[] values = {count1, count2, count3};
         history = new ArrayList<Integer[]>();
         history.add(values);
         // Create dataset
@@ -49,12 +49,12 @@ public class DrawChart extends JFrame {
         customize(plot);
     }
 
-    public void update(int countApple, int countGoogle, int countMicrosft, int time) {
+    public void update(int count1, int count2, int count3, int time) {
         this.time = time;
-        this.countApple = countApple;
-        this.countGoogle = countGoogle;
-        this.countMicrosoft = countMicrosft;
-        Integer[] values = {countApple, countGoogle, countMicrosft};
+        this.count1 = count1;
+        this.count2 = count2;
+        this.count3 = count3;
+        Integer[] values = {count1, count2, count3};
         history.add(values);
         // Create dataset
         XYDataset dataset = createDataset();
@@ -78,33 +78,33 @@ public class DrawChart extends JFrame {
 
         XYSeriesCollection dataset = new XYSeriesCollection();
 
-        XYSeries series = new XYSeries("Apple");
+        XYSeries series = new XYSeries(utils.Utils.getKeywords().get(0));
         if (history.size() > 1) {
             for (int i = 0; i < history.size(); i++) {
                 series.add(i * 10, history.get(i)[0]);
             }
         }
-        series.add(time, countApple); //add(x value, y value)
+        series.add(time, count1); //add(x value, y value)
 
         dataset.addSeries(series);
 
-        XYSeries series1 = new XYSeries("Google");
+        XYSeries series1 = new XYSeries(utils.Utils.getKeywords().get(1));
         if (history.size() > 1) {
             for (int i = 0; i < history.size(); i++) {
                 series1.add(i * 10, history.get(i)[1]);
             }
         }
-        series1.add(time, countGoogle);
+        series1.add(time, count2);
         //Add series to dataset
         dataset.addSeries(series1);
 
-        XYSeries series2 = new XYSeries("Microsoft");
+        XYSeries series2 = new XYSeries(utils.Utils.getKeywords().get(2));
         if (history.size() > 1) {
             for (int i = 0; i < history.size(); i++) {
                 series2.add(i * 10, history.get(i)[2]);
             }
         }
-        series2.add(time, countMicrosoft);
+        series2.add(time, count3);
         dataset.addSeries(series2);
 
         return dataset;

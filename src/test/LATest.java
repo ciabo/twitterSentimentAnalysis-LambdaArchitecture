@@ -117,7 +117,7 @@ public class LATest {
     @Test
     public void testServingLayer() throws InterruptedException {
         String[] keywords = {"google", "apple", "microsoft"};
-        Thread t = new Thread(new ServingLayer(keywords));
+        Thread t = new Thread(new ServingLayer());
         t.start();
         sleep(500);
         t.interrupt();
