@@ -66,6 +66,7 @@ public class ServingLayer implements Runnable {
             totalTweets2 = 1;
         if(totalTweets3 == 0)
             totalTweets3 = 1;
+        
         trend.add(0, trend1/totalTweets1);
         trend.add(1, trend2/totalTweets2);
         trend.add(2, trend3/totalTweets3);
