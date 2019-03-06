@@ -15,20 +15,20 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class DrawChart extends JFrame {
     private static final long serialVersionUID = 1L;
-    private int count1;
-    private int count2;
-    private int count3;
+    private float count1;
+    private float count2;
+    private float count3;
     private int time;
-    private List<Integer[]> history;
+    private List<Float[]> history;
 
-    public DrawChart(String title, int count1, int count2, int count3, int time) {
+    public DrawChart(String title, float count1, float count2, float count3, int time) {
         super(title);
         this.time = time;
         this.count1 = count1;
         this.count2 = count2;
         this.count3 = count3;
-        Integer[] values = {count1, count2, count3};
-        history = new ArrayList<Integer[]>();
+        Float[] values = {count1, count2, count3};
+        history = new ArrayList<Float[]>();
         history.add(values);
         // Create dataset
         XYDataset dataset = createDataset();
@@ -49,12 +49,12 @@ public class DrawChart extends JFrame {
         customize(plot);
     }
 
-    public void update(int count1, int count2, int count3, int time) {
+    public void update(float count1, float count2, float count3, int time) {
         this.time = time;
         this.count1 = count1;
         this.count2 = count2;
         this.count3 = count3;
-        Integer[] values = {count1, count2, count3};
+        Float[] values = {count1, count2, count3};
         history.add(values);
         // Create dataset
         XYDataset dataset = createDataset();

@@ -17,15 +17,15 @@ public class ServingLayer implements Runnable {
         this.keywords = utils.Utils.getKeywords();
     }
 
-    private List<Integer> getCounts(Map<String, Long> map) {
-        int trend1 = 0;
-        int trend2 = 0;
-        int trend3 = 0;
-        int totalTweets1 = 0;
-        int totalTweets2 = 0;
-        int totalTweets3 = 0;
+    private List<Float> getCounts(Map<String, Long> map) {
+        float trend1 = 0;
+        float trend2 = 0;
+        float trend3 = 0;
+        float totalTweets1 = 0;
+        float totalTweets2 = 0;
+        float totalTweets3 = 0;
 
-        List<Integer> trend = new ArrayList<Integer>();
+        List<Float> trend = new ArrayList<Float>();
         for (String key : map.keySet()) {
             if (key.contains(keywords.get(0))) {
                 totalTweets1++;
@@ -96,7 +96,7 @@ public class ServingLayer implements Runnable {
                 }
 
                 // plot trend
-                List<Integer> trend = getCounts(map);
+                List<Float> trend = getCounts(map);
                 dc.update(trend.get(0), trend.get(1), trend.get(2), time += 10);
                 dc.setSize(800, 400);
                 dc.setLocationRelativeTo(null);
