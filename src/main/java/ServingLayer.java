@@ -28,23 +28,36 @@ public class ServingLayer implements Runnable {
         List<Float> trend = new ArrayList<Float>();
         for (String key : map.keySet()) {
             if (key.contains(keywords.get(0))) {
-                totalTweets1++;
-                if (key.contains(Integer.toString(-1)))
+
+                if (key.contains(Integer.toString(-1))) {
                     trend1 -= map.get(key);
-                else if (key.contains(Integer.toString(1)))
+                    totalTweets1 += map.get(key);
+                }else if (key.contains(Integer.toString(1))) {
                     trend1 += map.get(key);
+                    totalTweets1 += map.get(key);
+                }else{
+                    totalTweets1 += map.get(key);
+                }
             } else if (key.contains(keywords.get(1))) {
-                totalTweets2++;
-                if (key.contains(Integer.toString(-1)))
+                if (key.contains(Integer.toString(-1))) {
                     trend2 -= map.get(key);
-                else if (key.contains(Integer.toString(1)))
+                    totalTweets2 += map.get(key);
+                }else if (key.contains(Integer.toString(1))) {
                     trend2 += map.get(key);
+                    totalTweets2 += map.get(key);
+                }else{
+                    totalTweets2 += map.get(key);
+                }
             } else if (key.contains(keywords.get(2))) {
-                totalTweets3++;
-                if (key.contains(Integer.toString(-1)))
+                if (key.contains(Integer.toString(-1))) {
                     trend3 -= map.get(key);
-                else if (key.contains(Integer.toString(1)))
+                    totalTweets3 += map.get(key);
+                }else if (key.contains(Integer.toString(1))) {
                     trend3 += map.get(key);
+                    totalTweets3 += map.get(key);
+                }else{
+                    totalTweets3 += map.get(key);
+                }
             }
         }
         if(totalTweets1 == 0)
@@ -89,12 +102,6 @@ public class ServingLayer implements Runnable {
                 for (String key : treeMap.keySet())
                     System.out.println(key + " | " + treeMap.get(key));
                 System.out.println("------------------");
-                try {
-                    sleep(10000);
-                } catch (InterruptedException e) {
-                    System.out.println("could not sleep the thread");
-                }
-
                 // plot trend
                 List<Float> trend = getCounts(map);
                 dc.update(trend.get(0), trend.get(1), trend.get(2), time += 10);
@@ -106,6 +113,13 @@ public class ServingLayer implements Runnable {
                 //cleaning of maps
                 map.clear();
                 treeMap.clear();
+                try {
+                    sleep(10000);
+                } catch (InterruptedException e) {
+                    System.out.println("could not sleep the thread");
+                }
+
+
             }
         } finally {
             //cleaning of maps
