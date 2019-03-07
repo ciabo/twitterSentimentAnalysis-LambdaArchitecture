@@ -32,44 +32,44 @@ public class ServingLayer implements Runnable {
                 if (key.contains(Integer.toString(-1))) {
                     trend1 -= map.get(key);
                     totalTweets1 += map.get(key);
-                }else if (key.contains(Integer.toString(1))) {
+                } else if (key.contains(Integer.toString(1))) {
                     trend1 += map.get(key);
                     totalTweets1 += map.get(key);
-                }else{
+                } else {
                     totalTweets1 += map.get(key);
                 }
             } else if (key.contains(keywords.get(1))) {
                 if (key.contains(Integer.toString(-1))) {
                     trend2 -= map.get(key);
                     totalTweets2 += map.get(key);
-                }else if (key.contains(Integer.toString(1))) {
+                } else if (key.contains(Integer.toString(1))) {
                     trend2 += map.get(key);
                     totalTweets2 += map.get(key);
-                }else{
+                } else {
                     totalTweets2 += map.get(key);
                 }
             } else if (key.contains(keywords.get(2))) {
                 if (key.contains(Integer.toString(-1))) {
                     trend3 -= map.get(key);
                     totalTweets3 += map.get(key);
-                }else if (key.contains(Integer.toString(1))) {
+                } else if (key.contains(Integer.toString(1))) {
                     trend3 += map.get(key);
                     totalTweets3 += map.get(key);
-                }else{
+                } else {
                     totalTweets3 += map.get(key);
                 }
             }
         }
-        if(totalTweets1 == 0)
+        if (totalTweets1 == 0)
             totalTweets1 = 1;
-        if(totalTweets2 == 0)
+        if (totalTweets2 == 0)
             totalTweets2 = 1;
-        if(totalTweets3 == 0)
+        if (totalTweets3 == 0)
             totalTweets3 = 1;
-        
-        trend.add(0, trend1/totalTweets1);
-        trend.add(1, trend2/totalTweets2);
-        trend.add(2, trend3/totalTweets3);
+
+        trend.add(0, trend1 / totalTweets1);
+        trend.add(1, trend2 / totalTweets2);
+        trend.add(2, trend3 / totalTweets3);
         return trend;
     }
 
@@ -119,8 +119,6 @@ public class ServingLayer implements Runnable {
                 } catch (InterruptedException e) {
                     System.out.println("could not sleep the thread");
                 }
-
-
             }
         } finally {
             //cleaning of maps

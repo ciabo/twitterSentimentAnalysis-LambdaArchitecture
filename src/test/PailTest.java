@@ -8,6 +8,8 @@ import org.apache.hadoop.fs.Path;
 import org.junit.*;
 import utils.Utils;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -39,36 +41,48 @@ public class PailTest {
     public void testBatchPail() throws IOException {
         DataStore.writeTweet(tweetPail, "15022019", "192133", "Team Giannis");
         DataStore.writeTweet(tweetPail, "01032019", "121133", "Team Ettore");
-        DataStore.readTweet(path);
+        List tweets = DataStore.readTweet(path);
+        Utils.printLisofList(tweets);
+        assertEquals(2, tweets.size());
     }
 
     @Test
     public void testBatchPailList() throws IOException {
         List<String> fulltweetB = Utils.generateTweet(line1);
         DataStore.writeTweet(tweetPail, fulltweetB.get(0), fulltweetB.get(1), fulltweetB.get(2));
-        DataStore.readTweet(path);
+        List tweets = DataStore.readTweet(path);
+        Utils.printLisofList(tweets);
+        assertEquals(3, tweets.size());
     }
 
     @Test
     public void testNewDataPail() throws IOException {
         DataStore.writeTweet(newPail, "13022019", "155849", "Team Lebron");
         DataStore.writeTweet(newPail, "01032019", "140547", "Team Luca");
-        DataStore.readTweet(newpath);
+        List tweets = DataStore.readTweet(newpath);
+        Utils.printLisofList(tweets);
+        assertEquals(2, tweets.size());
     }
 
     @Test
     public void testNewDataPailList() throws IOException {
         List<String> fulltweetF = Utils.generateTweet(line2);
         DataStore.writeTweet(newPail, fulltweetF.get(0), fulltweetF.get(1), fulltweetF.get(2));
-        DataStore.readTweet(newpath);
+        List tweets = DataStore.readTweet(newpath);
+        Utils.printLisofList(tweets);
+        assertEquals(3, tweets.size());
     }
 
     @Test
     public void testIngestion() throws IOException {
         DataStore.ingestPail(tweetPail, newPail, fs, "test"); // It uses Map Reduce
         System.out.println("\nData folder: ");
-        DataStore.readTweet(path);
+        List tweets = DataStore.readTweet(path);
+        Utils.printLisofList(tweets);
+        assertEquals(6, tweets.size());
         System.out.print("\nNew data folder: ");
-        DataStore.readTweet(newpath);
+        List newTweet = DataStore.readTweet(newpath);
+        Utils.printLisofList(newTweet);
+        assertEquals(0, newTweet.size());
     }
 }
