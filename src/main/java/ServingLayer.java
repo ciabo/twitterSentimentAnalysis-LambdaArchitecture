@@ -16,13 +16,13 @@ public class ServingLayer implements Runnable {
 
     public ServingLayer() {
         this.keywords = utils.Utils.getKeywords();
-        trend = new float[3];
-        totalTweets = new float[3];
     }
 
     private float[] getCounts(Map<String, Long> map) {
-
         float[] trends = new float[3];
+        trend = new float[3];
+        totalTweets = new float[3];
+
         for (String key : map.keySet()) {
             if (key.contains(keywords.get(0))) {
                 updateTrend(0, key);
