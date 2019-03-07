@@ -1,6 +1,5 @@
 import fastlayer.cassandra.SentimentRepository;
 
-import javax.swing.*;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -12,65 +11,45 @@ public class ServingLayer implements Runnable {
     private Map<String, Long> treeMap;
     private DrawChart dc;
     private int time = 0;
+    private float[] trend;
+    private float[] totalTweets;
 
     public ServingLayer() {
         this.keywords = utils.Utils.getKeywords();
+        trend = new float[3];
+        totalTweets = new float[3];
     }
 
-    private List<Float> getCounts(Map<String, Long> map) {
-        float trend1 = 0;
-        float trend2 = 0;
-        float trend3 = 0;
-        float totalTweets1 = 0;
-        float totalTweets2 = 0;
-        float totalTweets3 = 0;
+    private float[] getCounts(Map<String, Long> map) {
 
-        List<Float> trend = new ArrayList<Float>();
+        float[] trends = new float[3];
         for (String key : map.keySet()) {
             if (key.contains(keywords.get(0))) {
-
-                if (key.contains(Integer.toString(-1))) {
-                    trend1 -= map.get(key);
-                    totalTweets1 += map.get(key);
-                } else if (key.contains(Integer.toString(1))) {
-                    trend1 += map.get(key);
-                    totalTweets1 += map.get(key);
-                } else {
-                    totalTweets1 += map.get(key);
-                }
+                updateTrend(0, key);
             } else if (key.contains(keywords.get(1))) {
-                if (key.contains(Integer.toString(-1))) {
-                    trend2 -= map.get(key);
-                    totalTweets2 += map.get(key);
-                } else if (key.contains(Integer.toString(1))) {
-                    trend2 += map.get(key);
-                    totalTweets2 += map.get(key);
-                } else {
-                    totalTweets2 += map.get(key);
-                }
+                updateTrend(1, key);
             } else if (key.contains(keywords.get(2))) {
-                if (key.contains(Integer.toString(-1))) {
-                    trend3 -= map.get(key);
-                    totalTweets3 += map.get(key);
-                } else if (key.contains(Integer.toString(1))) {
-                    trend3 += map.get(key);
-                    totalTweets3 += map.get(key);
-                } else {
-                    totalTweets3 += map.get(key);
-                }
+                updateTrend(2, key);
             }
         }
-        if (totalTweets1 == 0)
-            totalTweets1 = 1;
-        if (totalTweets2 == 0)
-            totalTweets2 = 1;
-        if (totalTweets3 == 0)
-            totalTweets3 = 1;
 
-        trend.add(0, trend1 / totalTweets1);
-        trend.add(1, trend2 / totalTweets2);
-        trend.add(2, trend3 / totalTweets3);
-        return trend;
+        totalTweets[0] = totalTweets[0] == 0 ? 1 : totalTweets[0];
+        totalTweets[1] = totalTweets[1] == 0 ? 1 : totalTweets[1];
+        totalTweets[2] = totalTweets[2] == 0 ? 1 : totalTweets[2];
+
+        trends[0] = trend[0] / totalTweets[0];
+        trends[1] = trend[1] / totalTweets[1];
+        trends[2] = trend[2] / totalTweets[2];
+        return trends;
+    }
+
+    private void updateTrend(int keyindex, String key) {
+        if (key.contains(Integer.toString(-1))) {
+            trend[keyindex] -= map.get(key);
+        } else if (key.contains(Integer.toString(1))) {
+            trend[keyindex] += map.get(key);
+        }
+        totalTweets[keyindex] += map.get(key);
     }
 
     @Override
@@ -103,12 +82,12 @@ public class ServingLayer implements Runnable {
                 for (String key : treeMap.keySet())
                     System.out.println(key + " | " + treeMap.get(key));
                 System.out.println("------------------");
+
                 // plot trend
-                List<Float> trend = getCounts(map);
-                dc.update(trend.get(0), trend.get(1), trend.get(2), time += 10);
+                float[] trend = getCounts(map);
+                dc.update(trend[0], trend[1], trend[2], time += 10);
                 dc.setSize(800, 400);
                 dc.setLocationRelativeTo(null);
-//            dc.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 dc.setVisible(true);
 
                 //cleaning of maps
