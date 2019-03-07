@@ -10,9 +10,9 @@ import fastlayer.cassandra.SentimentRepository;
 import fastlayer.storm.CountBolt;
 import fastlayer.storm.SentimentBolt;
 import fastlayer.storm.TweetSpout;
-import masterdataset.DataStore;
-import masterdataset.MDatasetQuery;
-import masterdataset.TweetStructure;
+import batchlayer.pail.DataStore;
+import batchlayer.jcascalog.MDatasetQuery;
+import batchlayer.pail.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 

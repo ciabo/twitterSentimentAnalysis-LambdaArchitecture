@@ -6,11 +6,10 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import cascalog.test.RangeOp;
 import com.backtype.hadoop.pail.Pail;
 import com.backtype.support.Utils;
-import masterdataset.DataStore;
-import masterdataset.Tweet;
+import batchlayer.pail.DataStore;
+import batchlayer.pail.Tweet;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

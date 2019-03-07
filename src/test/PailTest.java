@@ -1,8 +1,8 @@
 
 
 import com.backtype.hadoop.pail.Pail;
-import masterdataset.DataStore;
-import masterdataset.TweetStructure;
+import batchlayer.pail.DataStore;
+import batchlayer.pail.TweetStructure;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.junit.*;

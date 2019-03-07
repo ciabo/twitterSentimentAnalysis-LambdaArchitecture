@@ -1,9 +1,8 @@
 import com.backtype.hadoop.pail.Pail;
 import fastlayer.cassandra.SentimentRepository;
-import masterdataset.DataStore;
-import masterdataset.MDatasetQuery;
-import masterdataset.Tweet;
-import masterdataset.TweetStructure;
+import batchlayer.pail.DataStore;
+import batchlayer.jcascalog.MDatasetQuery;
+import batchlayer.pail.TweetStructure;
 import utils.Utils;
 import org.apache.hadoop.fs.FileSystem;
 
