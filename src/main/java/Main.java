@@ -1,9 +1,9 @@
+
 import backtype.storm.LocalCluster;
-import batchlayer.pail.DataStore;
+import fastlayer.cassandra.SentimentRepository;
 import utils.Utils;
 
 import java.io.*;
-import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
@@ -11,7 +11,7 @@ import static java.lang.Thread.sleep;
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
 
-        System.out.println("Insert keywords (insert stop to break): ");
+        System.out.println("Insert 3 keywords (insert stop to break): ");
         Scanner sc = new Scanner(System.in);
         while (true) {
             String word = sc.next();
@@ -35,13 +35,18 @@ public class Main {
         // start ping pong
         Thread t = new Thread(new ServingLayer());
         t.start();
-        int k = 0; //Todo mettere un bel controllo sulla dimensione del file <-- non so a che serve.. usa countlines di Utils
+        int k = 1;
         while (k < 10000) {
             la.executeLA(init.getFs());
-            sleep(15000); //almost 4 tweets
+            sleep(15000);
+            if (k % 10 == 0) {
+                System.out.println("Recomputing all the batch");
+                la.recomputeBatch(SentimentRepository.getInstance());
+            }
             k++;
         }
         cluster.shutdown();
+
     }
 }
 
