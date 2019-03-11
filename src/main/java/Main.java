@@ -12,7 +12,7 @@ import static java.lang.Thread.sleep;
 public class Main {
     public static void main(String[] argv) throws IOException, InterruptedException {
 
-        System.out.println("Insert keywords(stop to break): ");
+        System.out.println("Insert keywords (insert stop to break): ");
         Scanner sc = new Scanner(System.in);
         while (true) {
             String word = sc.next();
