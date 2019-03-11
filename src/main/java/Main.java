@@ -1,4 +1,3 @@
-
 import backtype.storm.LocalCluster;
 import batchlayer.pail.DataStore;
 import utils.Utils;
@@ -43,12 +42,6 @@ public class Main {
             k++;
         }
         cluster.shutdown();
-
-        // tweets copied from stream to batch
-        System.out.println("\nNew tweets stored in dfs:");
-        List<List<String>> tweets = DataStore.readTweet(init.getBatchPath());
-        Utils.printLisofList(tweets);
-        System.out.println("Number of tweets: " + tweets.size());
     }
 }
 
